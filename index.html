@@ -1,621 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus Flow - Session Productivity</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- 1. Font Awesome FIRST -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- 2. Tailwind SECOND -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- 3. Your custom CSS LAST (so it wins specificity battles) -->
+    <link rel="stylesheet" href="assets/styles.css">
+    
+    <!-- 4. Critical inline overrides that ALWAYS win -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
-        }
-        
-        .gradient-card {
-            background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
-        }
-        
-        .accent-gradient {
-            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #10b981, #059669);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #059669, #047857);
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-        }
-        
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
-        }
-        
-        .focus-card {
-            background: linear-gradient(145deg, #020617 0%, #0f172a 100%);
-        }
-        
-        .nav-active {
-            color: #10b981 !important;
-            background: linear-gradient(145deg, #111827 0%, #0f172a 100%);
-        }
-        
-        .badge-active {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-        
-        .badge-inactive {
-            background: linear-gradient(135deg, #334155 0%, #1f2937 100%);
-        }
-        
-        .badge-roast {
-            background: linear-gradient(135deg, #78350f 0%, #451a03 100%);
-        }
-        
-        .progress-bar {
-            background: linear-gradient(90deg, #065f46 0%, #10b981 100%);
-        }
-        
-        .glow-effect {
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
-        }
-        
-        .task-complete {
-            text-decoration: line-through;
-            opacity: 0.5;
-        }
-        
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #020617; 
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #059669, #10b981); 
-            border-radius: 4px;
-        }
-        
-        .timer-display {
-            font-variant-numeric: tabular-nums;
-        }
-        
-        .task-item.active-task {
-            border-color: #10b981 !important;
-            box-shadow: 0 0 0 1px #10b981;
-        }
-        
-        .focus-task-selector {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100;
-        }
-        
-        .integrity-score {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-        }
-        
-        .streak-recovery {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-        
-        .history-subtab.active {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-        
-        .ai-output-list {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .ai-output-list li {
-            padding: 8px 0;
-            border-bottom: 1px solid #334155;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .ai-output-list li:last-child {
-            border-bottom: none;
-        }
-        
-        .ai-output-list li i {
-            margin-top: 4px;
-            flex-shrink: 0;
-        }
-        
-        #ai-panel-chevron.rotated {
-            transform: rotate(180deg);
-        }
-        
-        .history-table-row:hover {
-            background: rgba(16, 185, 129, 0.1);
-        }
-        
-        /* ========================
-           MOBILE RESPONSIVE STYLES
-           ======================== */
-        
-        /* Prevent accidental double taps on buttons */
-        .btn-primary, .btn-danger, button {
-            touch-action: manipulation;
-        }
-        
-        /* Mobile-first adjustments */
-        @media (max-width: 768px) {
-            /* Header adjustments */
-            header h1 {
-                font-size: 2rem !important;
-            }
-            
-            header h1 i {
-                font-size: 1.75rem !important;
-                margin-right: 0.5rem !important;
-            }
-            
-            header p {
-                font-size: 0.875rem !important;
-            }
-            
-            #header-user-badge {
-                padding: 0.375rem 0.75rem !important;
-            }
-            
-            #header-user-badge span {
-                font-size: 0.75rem !important;
-            }
-            
-            /* Navigation tabs - more compact */
-            .nav-tab .nav-link {
-                padding: 0.75rem 0.5rem !important;
-                font-size: 0.75rem !important;
-            }
-            
-            .nav-tab .nav-link i {
-                font-size: 1.25rem !important;
-            }
-            
-            /* Main container padding */
-            .container {
-                padding-left: 0.75rem !important;
-                padding-right: 0.75rem !important;
-            }
-            
-            /* Cards and sections - tighter padding */
-            .gradient-card, .focus-card {
-                padding: 1rem !important;
-            }
-            
-            /* To-do input - stack on mobile */
-            #idle-state .mb-6.flex.gap-3 {
-                flex-direction: column;
-            }
-            
-            #idle-state .mb-6.flex.gap-3 input {
-                width: 100%;
-            }
-            
-            #idle-state .mb-6.flex.gap-3 button {
-                width: 100%;
-            }
-            
-            /* Task items - more compact */
-            .task-item {
-                padding: 0.75rem !important;
-            }
-            
-            .task-item .task-title {
-                font-size: 0.9375rem !important;
-            }
-            
-            .task-item .task-checkbox {
-                width: 1.25rem !important;
-                height: 1.25rem !important;
-            }
-            
-            /* Status cards */
-            #idle-state .bg-slate-900\\/80 {
-                padding: 0.75rem !important;
-            }
-            
-            /* Focus timer screen */
-            #focus-state .focus-card {
-                padding: 1.5rem 1rem !important;
-            }
-            
-            #focus-timer {
-                font-size: 3.5rem !important;
-            }
-            
-            #focus-state h2 {
-                font-size: 1.25rem !important;
-            }
-            
-            #anchor-hint {
-                font-size: 0.75rem !important;
-            }
-            
-            /* Active task display in focus mode */
-            #active-task-display {
-                padding: 0.5rem 0.75rem !important;
-                font-size: 0.875rem !important;
-            }
-            
-            /* Focus stats grid - single column on very small */
-            #focus-state .grid.grid-cols-1.md\\:grid-cols-3 {
-                gap: 0.5rem !important;
-            }
-            
-            #focus-state .grid.grid-cols-1.md\\:grid-cols-3 > div {
-                padding: 0.75rem !important;
-            }
-            
-            #focus-state .grid.grid-cols-1.md\\:grid-cols-3 .text-3xl {
-                font-size: 1.5rem !important;
-            }
-            
-            /* Focus/Pause/End buttons - larger touch targets */
-            #pause-session, #end-session, #resume-session, #end-session-paused {
-                padding: 1rem 1.5rem !important;
-                font-size: 1rem !important;
-                min-height: 56px;
-            }
-            
-            #focus-state .flex.gap-4.justify-center {
-                flex-direction: column;
-                gap: 0.75rem !important;
-            }
-            
-            #focus-state .flex.gap-4.justify-center button {
-                width: 100%;
-            }
-            
-            /* Paused state */
-            #paused-state .timer-display.text-6xl {
-                font-size: 2.5rem !important;
-            }
-            
-            #paused-state .timer-display.text-5xl {
-                font-size: 2rem !important;
-            }
-            
-            #paused-state .flex.gap-3.flex-wrap {
-                flex-direction: column;
-            }
-            
-            #paused-state .flex.gap-3.flex-wrap button {
-                width: 100%;
-            }
-            
-            /* Summary state */
-            #summary-state .gradient-card {
-                padding: 1.25rem !important;
-            }
-            
-            #summary-state h2 {
-                font-size: 1.5rem !important;
-            }
-            
-            #summary-state .grid.grid-cols-1.md\\:grid-cols-4 {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 0.75rem !important;
-            }
-            
-            #summary-state .grid.grid-cols-1.md\\:grid-cols-4 > div {
-                padding: 1rem !important;
-            }
-            
-            #summary-state .grid.grid-cols-1.md\\:grid-cols-4 .text-4xl {
-                font-size: 1.5rem !important;
-            }
-            
-            #summary-state .grid.grid-cols-1.md\\:grid-cols-4 .text-3xl {
-                font-size: 1.25rem !important;
-            }
-            
-            #summary-state .flex.gap-4.justify-center {
-                flex-direction: column;
-            }
-            
-            #summary-state .flex.gap-4.justify-center button {
-                width: 100%;
-                padding: 1rem !important;
-            }
-            
-            /* Profile tab */
-            #profile .gradient-card {
-                padding: 1rem !important;
-            }
-            
-            #profile h2 {
-                font-size: 1.5rem !important;
-            }
-            
-            #profile .grid.grid-cols-1.md\\:grid-cols-2 {
-                gap: 0.75rem !important;
-            }
-            
-            /* Badges grid - 2 columns on mobile */
-            #badges-container {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 0.5rem !important;
-            }
-            
-            #badges-container > div {
-                padding: 0.75rem !important;
-            }
-            
-            #badges-container i {
-                font-size: 1.5rem !important;
-            }
-            
-            #badges-container .font-semibold {
-                font-size: 0.75rem !important;
-            }
-            
-            #badges-container .text-xs {
-                font-size: 0.625rem !important;
-            }
-            
-            /* Lifetime stats grid */
-            #profile .grid.grid-cols-2.md\\:grid-cols-4 {
-                gap: 0.5rem !important;
-            }
-            
-            #profile .grid.grid-cols-2.md\\:grid-cols-4 > div {
-                padding: 0.75rem !important;
-            }
-            
-            #profile .grid.grid-cols-2.md\\:grid-cols-4 .text-2xl {
-                font-size: 1.25rem !important;
-            }
-            
-            /* History tab */
-            #history .gradient-card {
-                padding: 1rem !important;
-            }
-            
-            #history h2 {
-                font-size: 1.25rem !important;
-            }
-            
-            /* History sub-tabs */
-            .history-subtab {
-                padding: 0.5rem 0.75rem !important;
-                font-size: 0.75rem !important;
-            }
-            
-            /* History filters - stack on mobile */
-            #history-data-content .mb-6.flex.flex-wrap {
-                flex-direction: column;
-                gap: 0.75rem !important;
-            }
-            
-            #history-data-content .mb-6.flex.flex-wrap .ml-auto {
-                margin-left: 0 !important;
-                width: 100%;
-            }
-            
-            #history-data-content .mb-6.flex.flex-wrap .ml-auto .flex {
-                width: 100%;
-            }
-            
-            #history-data-content .mb-6.flex.flex-wrap .ml-auto button {
-                flex: 1;
-            }
-            
-            /* History table - horizontal scroll */
-            #history .overflow-x-auto {
-                margin-left: -1rem;
-                margin-right: -1rem;
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
-            
-            #history table {
-                min-width: 700px;
-                font-size: 0.75rem;
-            }
-            
-            #history th, #history td {
-                padding: 0.5rem 0.375rem !important;
-                white-space: nowrap;
-            }
-            
-            /* History cards */
-            #history-cards {
-                grid-template-columns: 1fr !important;
-            }
-            
-            #history-cards > div {
-                padding: 1rem !important;
-            }
-            
-            /* AI Panel */
-            #ai-panel-toggle {
-                padding: 0.75rem !important;
-            }
-            
-            #ai-panel-toggle .w-12 {
-                width: 2.5rem !important;
-                height: 2.5rem !important;
-            }
-            
-            #ai-panel-toggle h3 {
-                font-size: 1rem !important;
-            }
-            
-            #ai-panel-toggle p {
-                font-size: 0.75rem !important;
-            }
-            
-            /* AI command buttons */
-            .ai-command-btn {
-                padding: 0.75rem !important;
-            }
-            
-            .ai-command-btn i {
-                font-size: 1.25rem !important;
-            }
-            
-            .ai-command-btn span.text-slate-200 {
-                font-size: 0.875rem !important;
-            }
-            
-            .ai-command-btn span.text-slate-500 {
-                font-size: 0.6875rem !important;
-            }
-            
-            /* AI output */
-            #ai-output {
-                padding: 0.75rem !important;
-                font-size: 0.875rem !important;
-            }
-            
-            /* Footer */
-            footer {
-                padding-top: 1.5rem !important;
-                margin-top: 2rem !important;
-            }
-            
-            footer p {
-                font-size: 0.75rem !important;
-            }
-        }
-        
-        /* Extra small screens (phones in portrait) */
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 1.5rem !important;
-            }
-            
-            header h1 i {
-                font-size: 1.25rem !important;
-            }
-            
-            /* Focus timer even smaller */
-            #focus-timer {
-                font-size: 2.75rem !important;
-            }
-            
-            /* Summary grid - single column */
-            #summary-state .grid.grid-cols-1.md\\:grid-cols-4 {
-                grid-template-columns: 1fr !important;
-            }
-            
-            /* Start session button - full width, prominent */
-            #start-session, #finish-day {
-                font-size: 1rem !important;
-                padding: 1rem !important;
-            }
-            
-            /* Quick stats grid */
-            #idle-state .grid.grid-cols-2.gap-3 {
-                gap: 0.5rem !important;
-            }
-            
-            #idle-state .grid.grid-cols-2.gap-3 > div {
-                padding: 0.5rem !important;
-            }
-            
-            /* User profile section */
-            #profile .flex.items-center.justify-center.gap-4 {
-                padding: 0.75rem !important;
-            }
-            
-            #profile .w-14 {
-                width: 2.5rem !important;
-                height: 2.5rem !important;
-            }
-            
-            #profile-display-name {
-                font-size: 1rem !important;
-            }
-        }
-        
-        /* Landscape mode on mobile - ensure timer is visible */
-        @media (max-height: 500px) and (orientation: landscape) {
-            #focus-state .focus-card {
-                padding: 0.75rem !important;
-            }
-            
-            #focus-timer {
-                font-size: 2.5rem !important;
-                margin-bottom: 0.5rem !important;
-            }
-            
-            #focus-state .mt-8.mb-6 {
-                margin-top: 0.5rem !important;
-                margin-bottom: 0.5rem !important;
-            }
-            
-            #focus-state .grid.grid-cols-1.md\\:grid-cols-3 {
-                display: none !important;
-            }
-            
-            #focus-state .w-full.bg-slate-800.rounded-full.h-2.mb-10 {
-                margin-bottom: 0.75rem !important;
-            }
-        }
-        
-        /* Ensure minimum touch target size (44x44px) */
-        @media (pointer: coarse) {
-            button, .task-checkbox, .nav-link, .task-item {
-                min-height: 44px;
-            }
-            
-            .task-checkbox {
-                min-width: 44px;
-                min-height: 44px;
-            }
-            
-            /* Larger checkboxes on touch devices */
-            input[type="checkbox"] {
-                width: 1.5rem !important;
-                height: 1.5rem !important;
-            }
+        html, body {
+            background: linear-gradient(135deg, #0f172a 0%, #020617 100%) !important;
+            min-height: 100vh;
+            color: #f1f5f9;
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-100">
+<body class="min-h-screen text-slate-100" style="background: linear-gradient(135deg, #0f172a 0%, #020617 100%);">
     <div class="container mx-auto px-4 py-6 max-w-6xl">
-        <!-- Header -->
         <header class="text-center mb-8 pb-4 border-b border-slate-800">
             <h1 class="text-5xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent mb-2">
                 <i class="fas fa-brain text-emerald-400 mr-3"></i>Focus Flow
             </h1>
             <p class="text-slate-400 text-lg">Session-based effort, honest metrics</p>
-            <!-- User Badge (small, non-intrusive) -->
-            <div id="header-user-badge" class="mt-3 inline-flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700">
+            <div id="header-user-badge" class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-700" style="background: rgba(30,41,59,0.5);">
                 <i class="fas fa-user-circle text-emerald-400"></i>
                 <span id="header-display-name" class="text-slate-300 text-sm font-medium">User_Newcomer</span>
             </div>
         </header>
         
-        <!-- Main Content -->
         <main class="grid grid-cols-1 gap-8">
             
-            <!-- Navigation Tabs -->
             <nav class="gradient-card rounded-2xl p-2 shadow-2xl border border-slate-700">
                 <ul class="flex flex-wrap justify-around items-center gap-3">
                     <li class="nav-tab active flex-1 text-center" data-tab="home">
@@ -636,68 +58,62 @@
                 </ul>
             </nav>
             
-            <!-- Home Tab - State-Based Content -->
             <section id="home" class="tab-content active">
                 
-                <!-- Idle/Home State - Default -->
                 <div id="idle-state" class="state-content">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         
-                        <!-- To-Do Planner Section -->
                         <div class="lg:col-span-2 gradient-card rounded-2xl p-6 border border-slate-700 shadow-xl">
                             <h2 class="text-2xl font-bold text-emerald-400 mb-6 flex items-center gap-3">
                                 <i class="fas fa-list-check"></i>Today's Focus Plan
                             </h2>
                             
-                            <!-- Task Input -->
                             <div class="mb-6 flex gap-3">
                                 <input type="text" id="new-task" 
                                        placeholder="Add a task to your plan..." 
-                                       class="flex-1 px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
-                                <button id="add-task" class="btn-primary px-6 py-3 rounded-xl font-semibold shadow-lg">
+                                       class="flex-1 px-4 py-3 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                       style="background: #0f172a; border: 1px solid #334155; color: #e2e8f0;">
+                                <button id="add-task" class="btn-primary px-6 py-3 rounded-xl font-semibold shadow-lg text-white">
                                     <i class="fas fa-plus mr-2"></i>Add
                                 </button>
                             </div>
                             
-                            <!-- Task List -->
                             <div id="task-list" class="space-y-3"></div>
                             <p id="empty-tasks" class="text-slate-500 text-sm mt-3">No tasks yet. Add your first focus task.</p>
                         </div>
                         
-                        <!-- Status & Quick Actions -->
                         <div class="gradient-card rounded-2xl p-6 border border-slate-700 shadow-xl">
                             <h2 class="text-xl font-semibold text-slate-200 mb-6 flex items-center gap-2">
                                 <i class="fas fa-gauge-high text-cyan-400"></i>Session Status
                             </h2>
                             
                             <div class="space-y-4 mb-6">
-                                <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700">
+                                <div class="rounded-xl p-4 border border-slate-700" style="background: rgba(15,23,42,0.8);">
                                     <div class="text-slate-400 text-sm font-medium mb-1 flex items-center gap-2">
                                         <i class="fas fa-calendar-day"></i>Today's Date
                                     </div>
                                     <div id="today-label" class="text-emerald-400 text-2xl font-bold">--</div>
                                 </div>
                                 
-                                <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700">
+                                <div class="rounded-xl p-4 border border-slate-700" style="background: rgba(15,23,42,0.8);">
                                     <div class="text-slate-400 text-sm font-medium mb-1 flex items-center gap-2">
                                         <i class="fas fa-list-check text-emerald-400"></i>To-Do Completion
                                     </div>
                                     <div class="flex items-center gap-3">
-                                        <div class="flex-1 h-2 bg-slate-800 rounded-full">
-                                            <div id="todo-progress" class="h-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400" style="width: 0%"></div>
+                                        <div class="flex-1 h-2 rounded-full" style="background: #1e293b;">
+                                            <div id="todo-progress" class="h-2 rounded-full" style="width: 0%; background: linear-gradient(90deg, #10b981, #2dd4bf);"></div>
                                         </div>
                                         <span id="todo-percent" class="text-emerald-400 font-bold">0%</span>
                                     </div>
                                 </div>
                                 
-                                <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700">
+                                <div class="rounded-xl p-4 border border-slate-700" style="background: rgba(15,23,42,0.8);">
                                     <div class="text-slate-400 text-sm font-medium mb-1 flex items-center gap-2">
                                         <i class="fas fa-layer-group text-cyan-400"></i>Sessions Today
                                     </div>
                                     <div id="sessions-count" class="text-slate-200 text-3xl font-bold">0</div>
                                 </div>
                                 
-                                <!-- Focus Integrity Score -->
                                 <div class="integrity-score rounded-xl p-4 border border-indigo-500/50">
                                     <div class="text-white/80 text-sm font-medium mb-1 flex items-center gap-2">
                                         <i class="fas fa-shield-halved"></i>Focus Integrity Score
@@ -707,25 +123,22 @@
                                 </div>
                             </div>
                             
-                            <!-- Start Session Button -->
-                            <button id="start-session" class="w-full btn-primary text-xl font-bold py-4 rounded-xl shadow-2xl glow-effect mb-3">
+                            <button id="start-session" class="w-full btn-primary text-xl font-bold py-4 rounded-xl shadow-2xl glow-effect mb-3 text-white">
                                 <i class="fas fa-play-circle mr-2"></i>Start New Session
                             </button>
                             
-                            <!-- Finish Day Button -->
-                            <button id="finish-day" class="w-full bg-slate-800 hover:bg-slate-700 text-lg font-semibold py-3 rounded-xl shadow-lg border border-slate-600 mb-4 transition-all">
+                            <button id="finish-day" class="w-full text-lg font-semibold py-3 rounded-xl shadow-lg border border-slate-600 mb-4 transition-all text-slate-200" style="background: #1e293b;">
                                 <i class="fas fa-flag-checkered mr-2"></i>Finish Day & View Summary
                             </button>
                             
-                            <!-- Quick Stats -->
                             <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Quick Overview</h3>
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-3 rounded-xl text-center">
+                                <div class="p-3 rounded-xl text-center" style="background: linear-gradient(to bottom right, #1e293b, #0f172a);">
                                     <i class="fas fa-clock text-yellow-400 text-xl block mb-1"></i>
                                     <div class="text-slate-400 text-xs">Total Focus</div>
                                     <div id="quick-focus" class="text-slate-200 text-lg font-semibold">0m</div>
                                 </div>
-                                <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-3 rounded-xl text-center">
+                                <div class="p-3 rounded-xl text-center" style="background: linear-gradient(to bottom right, #1e293b, #0f172a);">
                                     <i class="fas fa-tasks text-blue-400 text-xl block mb-1"></i>
                                     <div class="text-slate-400 text-xs">Completed</div>
                                     <div id="quick-completion" class="text-slate-200 text-lg font-semibold">0%</div>
@@ -735,7 +148,6 @@
                     </div>
                 </div>
                 
-                <!-- Active Focus State -->
                 <div id="focus-state" class="state-content hidden">
                     <div class="focus-card rounded-3xl p-10 shadow-2xl border border-slate-700 text-center">
                         <h2 class="text-3xl font-bold text-slate-200 mb-3 flex items-center justify-center gap-3">
@@ -747,37 +159,35 @@
                             <div id="focus-timer" class="timer-display text-9xl font-bold text-emerald-400 mb-4">00:00:00</div>
                             <div class="text-slate-500 text-sm">Anchor time: <span id="anchor-hint">00:00:00</span></div>
                             
-                            <!-- Active Task Display - Click to change -->
-                            <div id="active-task-display" class="mt-4 cursor-pointer hover:bg-slate-900/50 inline-block px-6 py-3 rounded-xl border border-slate-700 transition-all" onclick="showTaskSelectorInFocus()">
+                            <div id="active-task-display" class="mt-4 cursor-pointer inline-block px-6 py-3 rounded-xl border border-slate-700 transition-all" style="background: rgba(15,23,42,0.5);" onclick="showTaskSelectorInFocus()">
                                 <i class="fas fa-bullseye mr-2 text-emerald-400"></i>
                                 <span id="active-task-title" class="text-slate-300">No task selected - click to choose</span>
                                 <i class="fas fa-chevron-down ml-2 text-slate-500"></i>
                             </div>
                             
-                            <!-- Task Selector Modal (Hidden by default) -->
-                            <div id="focus-task-selector" class="hidden mt-4 p-4 bg-slate-900 border border-slate-700 rounded-xl max-w-md mx-auto">
+                            <div id="focus-task-selector" class="hidden mt-4 p-4 border border-slate-700 rounded-xl max-w-md mx-auto" style="background: #0f172a;">
                                 <h4 class="text-slate-300 font-semibold mb-3">Select Active Task</h4>
                                 <div id="focus-task-options" class="space-y-2"></div>
                                 <button onclick="hideTaskSelectorInFocus()" class="mt-3 text-slate-400 text-sm hover:text-slate-200">Cancel</button>
                             </div>
                         </div>
                         
-                        <div class="w-full bg-slate-800 rounded-full h-2 mb-10">
+                        <div class="w-full rounded-full h-2 mb-10" style="background: #1e293b;">
                             <div id="focus-progress" class="progress-bar h-2 rounded-full" style="width: 0%"></div>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-10">
-                            <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700">
+                            <div class="p-4 rounded-xl border border-slate-700" style="background: rgba(15,23,42,0.7);">
                                 <i class="fas fa-brain text-indigo-400 text-2xl block mb-2"></i>
                                 <div class="text-slate-400 text-sm">Tasks Done</div>
                                 <div id="focus-tasks-done" class="text-slate-200 text-3xl font-bold">0</div>
                             </div>
-                            <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700">
+                            <div class="p-4 rounded-xl border border-slate-700" style="background: rgba(15,23,42,0.7);">
                                 <i class="fas fa-rotate-right text-purple-400 text-2xl block mb-2"></i>
                                 <div class="text-slate-400 text-sm">Segments</div>
                                 <div id="focus-segments" class="text-slate-200 text-3xl font-bold">0</div>
                             </div>
-                            <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700">
+                            <div class="p-4 rounded-xl border border-slate-700" style="background: rgba(15,23,42,0.7);">
                                 <i class="fas fa-chart-line text-blue-400 text-2xl block mb-2"></i>
                                 <div class="text-slate-400 text-sm">Productivity</div>
                                 <div id="focus-productivity" class="text-emerald-400 text-3xl font-bold">0%</div>
@@ -785,17 +195,16 @@
                         </div>
                         
                         <div class="flex gap-4 justify-center flex-wrap">
-                            <button id="pause-session" class="btn-primary text-xl font-semibold px-10 py-4 rounded-2xl shadow-2xl">
+                            <button id="pause-session" class="btn-primary text-xl font-semibold px-10 py-4 rounded-2xl shadow-2xl text-white">
                                 <i class="fas fa-pause-circle mr-2"></i>Pause / Switch Task
                             </button>
-                            <button id="end-session" class="btn-danger text-xl font-semibold px-10 py-4 rounded-2xl shadow-2xl">
+                            <button id="end-session" class="btn-danger text-xl font-semibold px-10 py-4 rounded-2xl shadow-2xl text-white">
                                 <i class="fas fa-stop-circle mr-2"></i>End Session
                             </button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Paused/Break State -->
                 <div id="paused-state" class="state-content hidden">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="gradient-card rounded-2xl p-6 border border-slate-700 shadow-xl">
@@ -831,10 +240,10 @@
                             </div>
                             
                             <div class="flex gap-3 flex-wrap">
-                                <button id="resume-session" class="btn-primary text-lg font-semibold px-6 py-3 rounded-xl shadow-lg">
+                                <button id="resume-session" class="btn-primary text-lg font-semibold px-6 py-3 rounded-xl shadow-lg text-white">
                                     <i class="fas fa-play mr-2"></i>Resume Focus
                                 </button>
-                                <button id="end-session-paused" class="btn-danger text-lg font-semibold px-6 py-3 rounded-xl shadow-lg">
+                                <button id="end-session-paused" class="btn-danger text-lg font-semibold px-6 py-3 rounded-xl shadow-lg text-white">
                                     <i class="fas fa-stop mr-2"></i>End Session
                                 </button>
                             </div>
@@ -864,7 +273,6 @@
                     </div>
                 </div>
                 
-                <!-- Day End Summary State -->
                 <div id="summary-state" class="state-content hidden">
                     <div class="gradient-card rounded-2xl p-8 border border-slate-700 shadow-2xl">
                         <h2 class="text-4xl font-extrabold text-center text-emerald-400 mb-2 flex items-center justify-center gap-3">
@@ -874,7 +282,7 @@
                         <p id="summary-date" class="text-center text-slate-400 mb-10 text-lg">--</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                            <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-700 text-center">
+                            <div class="p-6 rounded-xl border border-slate-700 text-center" style="background: rgba(15,23,42,0.8);">
                                 <i class="fas fa-hourglass-end text-yellow-400 text-3xl block mb-3"></i>
                                 <h3 class="text-slate-400 text-sm mb-2 uppercase tracking-wider">Total Anchor Time</h3>
                                 <div id="summary-anchor" class="text-slate-200 text-4xl font-bold">0h 0m</div>
@@ -886,7 +294,7 @@
                                 <div id="summary-focus" class="text-white text-4xl font-bold">0h 0m</div>
                             </div>
                             
-                            <div class="bg-gradient-to-br from-indigo-900 to-slate-800 p-6 rounded-xl border border-slate-700 text-center">
+                            <div class="p-6 rounded-xl border border-slate-700 text-center" style="background: linear-gradient(to bottom right, #312e81, #1e293b);">
                                 <i class="fas fa-percentage text-indigo-400 text-3xl block mb-3"></i>
                                 <h3 class="text-slate-400 text-sm mb-2 uppercase tracking-wider">Overall Productivity</h3>
                                 <div id="summary-productivity" class="text-indigo-300 text-4xl font-bold">0%</div>
@@ -900,18 +308,18 @@
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            <div class="bg-slate-900 rounded-xl p-6 border border-slate-700">
+                            <div class="rounded-xl p-6 border border-slate-700" style="background: #0f172a;">
                                 <h3 class="text-xl font-semibold text-slate-200 mb-4">Tasks Completed</h3>
                                 <div class="flex items-center gap-4">
                                     <span id="summary-tasks" class="text-slate-400 text-2xl"><i class="fas fa-check text-emerald-400 mr-1"></i>0 of 0</span>
-                                    <div class="flex-1 h-3 bg-slate-800 rounded-full">
-                                        <div id="summary-task-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-3 rounded-full" style="width: 0%"></div>
+                                    <div class="flex-1 h-3 rounded-full" style="background: #1e293b;">
+                                        <div id="summary-task-bar" class="h-3 rounded-full" style="width: 0%; background: linear-gradient(90deg, #10b981, #2dd4bf);"></div>
                                     </div>
                                     <span id="summary-task-percent" class="text-emerald-400 font-bold text-xl">0%</span>
                                 </div>
                             </div>
                             
-                            <div class="bg-slate-900 rounded-xl p-6 border border-slate-700">
+                            <div class="rounded-xl p-6 border border-slate-700" style="background: #0f172a;">
                                 <h3 class="text-xl font-semibold text-slate-200 mb-4">Sessions & Streaks</h3>
                                 <div id="summary-sessions" class="text-slate-300 text-xl">
                                     <i class="fas fa-calendar-check text-cyan-400 mr-2"></i>0 Completed Sessions
@@ -923,10 +331,10 @@
                         
                         <div class="text-center space-y-4">
                             <div class="flex gap-4 justify-center flex-wrap">
-                                <button id="continue-day" class="bg-slate-800 hover:bg-slate-700 text-xl font-semibold px-10 py-4 rounded-2xl shadow-xl border border-slate-700 transition-all">
+                                <button id="continue-day" class="text-xl font-semibold px-10 py-4 rounded-2xl shadow-xl border border-slate-700 transition-all text-slate-200" style="background: #1e293b;">
                                     <i class="fas fa-play-circle mr-2"></i>Continue Day
                                 </button>
-                                <button id="new-day" class="btn-primary text-xl font-semibold px-10 py-4 rounded-2xl shadow-2xl">
+                                <button id="new-day" class="btn-primary text-xl font-semibold px-10 py-4 rounded-2xl shadow-2xl text-white">
                                     <i class="fas fa-calendar-day mr-2"></i>Start New Day
                                 </button>
                             </div>
@@ -936,39 +344,35 @@
                 </div>
             </section>
             
-            <!-- Profile Tab - Dynamic Layout -->
             <section id="profile" class="tab-content hidden">
                 <div class="gradient-card rounded-2xl p-8 border border-slate-700 shadow-xl">
                     
-                    <!-- User Identity Section -->
-                    <div class="flex items-center justify-center gap-4 mb-8 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 border border-slate-700 max-w-md mx-auto">
-                        <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div class="flex items-center justify-center gap-4 mb-8 rounded-2xl p-5 border border-slate-700 max-w-md mx-auto" style="background: linear-gradient(to bottom right, #1e293b, #0f172a);">
+                        <div class="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0" style="background: linear-gradient(to bottom right, #10b981, #0d9488);">
                             <i class="fas fa-user text-white text-xl"></i>
                         </div>
                         <div class="flex-1 min-w-0">
                             <p id="profile-display-name" class="text-xl font-bold text-emerald-400 truncate">User_Newcomer</p>
                             <p id="profile-level-info" class="text-slate-400 text-xs">Level 1 • 0 active days</p>
                             
-                            <!-- Username Row -->
                             <div class="mt-2">
-                                <!-- Display Mode -->
                                 <div id="username-display" class="hidden flex items-center gap-2">
                                     <span id="username-text" class="text-slate-400 text-sm truncate"></span>
-                                    <button id="edit-username-btn" class="text-slate-500 hover:text-emerald-400 transition-all p-1 rounded hover:bg-slate-700">
+                                    <button id="edit-username-btn" class="text-slate-500 hover:text-emerald-400 transition-all p-1 rounded" style="background: transparent;">
                                         <i class="fas fa-pencil text-xs"></i>
                                     </button>
                                 </div>
                                 
-                                <!-- Edit Mode -->
                                 <div id="username-edit" class="flex items-center gap-2">
                                     <input type="text" id="username-input" 
                                            placeholder="Your name..." 
                                            maxlength="20"
-                                           class="px-3 py-1.5 bg-slate-900 border border-slate-600 rounded-lg text-slate-200 text-sm focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all w-32">
-                                    <button id="save-username" class="text-emerald-400 hover:text-emerald-300 p-1.5 rounded hover:bg-slate-700 transition-all">
+                                           class="px-3 py-1.5 rounded-lg text-slate-200 text-sm focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all w-32"
+                                           style="background: #0f172a; border: 1px solid #475569;">
+                                    <button id="save-username" class="text-emerald-400 hover:text-emerald-300 p-1.5 rounded transition-all" style="background: transparent;">
                                         <i class="fas fa-check text-sm"></i>
                                     </button>
-                                    <button id="cancel-username-edit" class="hidden text-slate-500 hover:text-slate-300 p-1.5 rounded hover:bg-slate-700 transition-all">
+                                    <button id="cancel-username-edit" class="hidden text-slate-500 hover:text-slate-300 p-1.5 rounded transition-all" style="background: transparent;">
                                         <i class="fas fa-times text-sm"></i>
                                     </button>
                                 </div>
@@ -976,14 +380,13 @@
                         </div>
                     </div>
                     
-                    <!-- Level Progress -->
-                    <div class="mb-8 bg-slate-900/50 rounded-xl p-4 border border-slate-700">
+                    <div class="mb-8 rounded-xl p-4 border border-slate-700" style="background: rgba(15,23,42,0.5);">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-slate-300 font-medium"><i class="fas fa-chart-simple text-cyan-400 mr-2"></i>Level Progress</span>
                             <span id="level-progress-text" class="text-slate-400 text-sm">0 / 3 days to next level</span>
                         </div>
-                        <div class="h-3 bg-slate-800 rounded-full overflow-hidden">
-                            <div id="level-progress-bar" class="h-3 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full transition-all" style="width: 0%"></div>
+                        <div class="h-3 rounded-full overflow-hidden" style="background: #1e293b;">
+                            <div id="level-progress-bar" class="h-3 rounded-full transition-all" style="width: 0%; background: linear-gradient(90deg, #06b6d4, #10b981);"></div>
                         </div>
                         <p class="text-slate-500 text-xs mt-2">Level is based on active days only, not productivity or streaks</p>
                     </div>
@@ -992,9 +395,8 @@
                         <i class="fas fa-crown text-yellow-400"></i>Achievements
                     </h2>
                     
-                    <!-- Rank & Streak -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-gradient-to-br from-yellow-900 to-orange-900 p-6 rounded-2xl border border-yellow-700">
+                        <div class="p-6 rounded-2xl border border-yellow-700" style="background: linear-gradient(to bottom right, #78350f, #92400e);">
                             <h3 class="text-yellow-300 text-xl font-semibold mb-4">
                                 <i class="fas fa-ranking-star mr-2"></i>Current Rank
                             </h3>
@@ -1002,46 +404,43 @@
                             <p id="profile-rank-next" class="text-yellow-300/80 text-sm">Complete your first session to advance</p>
                         </div>
                         
-                        <div class="bg-gradient-to-br from-blue-900 to-indigo-900 p-6 rounded-2xl border border-blue-700">
+                        <div class="p-6 rounded-2xl border border-blue-700" style="background: linear-gradient(to bottom right, #1e3a5f, #312e81);">
                             <h3 class="text-blue-300 text-xl font-semibold mb-4">
                                 <i class="fas fa-fire-burner mr-2"></i>Streaks
                             </h3>
                             <p id="profile-streak" class="text-3xl font-bold text-white mb-1">0 <span class="text-base text-blue-300">days</span></p>
                             <p id="profile-longest-streak" class="text-blue-300/80 text-sm">Longest streak: <span class="font-semibold">0 days</span></p>
-                            <div id="profile-streak-recovery" class="hidden mt-3 p-2 bg-amber-900/50 rounded-lg text-amber-300 text-xs">
+                            <div id="profile-streak-recovery" class="hidden mt-3 p-2 rounded-lg text-amber-300 text-xs" style="background: rgba(120,53,15,0.5);">
                                 <i class="fas fa-exclamation-triangle mr-1"></i>Streak recovery available
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Badges -->
                     <h3 class="text-2xl font-semibold text-slate-200 mb-4 border-l-4 border-emerald-500 pl-4">Badges</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="badges-container">
-                        <!-- Badges will be populated dynamically -->
                     </div>
                     
-                    <!-- Lifetime Stats -->
                     <h3 class="text-2xl font-semibold text-slate-200 mb-4 border-l-4 border-cyan-500 pl-4">Lifetime Stats</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700 text-center">
+                        <div class="p-4 rounded-xl border border-slate-700 text-center" style="background: rgba(15,23,42,0.7);">
                             <i class="fas fa-clock text-yellow-400 text-xl block mb-1"></i>
                             <p class="text-slate-400 text-sm">Total Focus</p>
                             <p id="profile-total-focus" class="text-slate-200 text-2xl font-bold">0h</p>
                         </div>
                         
-                        <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700 text-center">
+                        <div class="p-4 rounded-xl border border-slate-700 text-center" style="background: rgba(15,23,42,0.7);">
                             <i class="fas fa-calendar-week text-blue-400 text-xl block mb-1"></i>
                             <p class="text-slate-400 text-sm">Days Active</p>
                             <p id="profile-days-active" class="text-slate-200 text-2xl font-bold">0</p>
                         </div>
                         
-                        <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700 text-center">
+                        <div class="p-4 rounded-xl border border-slate-700 text-center" style="background: rgba(15,23,42,0.7);">
                             <i class="fas fa-circle-check text-green-400 text-xl block mb-1"></i>
                             <p class="text-slate-400 text-sm">Tasks Done</p>
                             <p id="profile-tasks-done" class="text-slate-200 text-2xl font-bold">0</p>
                         </div>
                         
-                        <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-700 text-center">
+                        <div class="p-4 rounded-xl border border-slate-700 text-center" style="background: rgba(15,23,42,0.7);">
                             <i class="fas fa-chart-line text-purple-400 text-xl block mb-1"></i>
                             <p class="text-slate-400 text-sm">Avg. Productivity</p>
                             <p id="profile-avg-productivity" class="text-slate-200 text-2xl font-bold">0%</p>
@@ -1050,49 +449,44 @@
                 </div>
             </section>
             
-            <!-- History Tab - Dynamic Layout -->
             <section id="history" class="tab-content hidden">
                 <div class="gradient-card rounded-2xl p-8 border border-slate-700 shadow-xl">
                     <h2 class="text-3xl font-extrabold text-center text-slate-200 mb-8 flex items-center gap-3 justify-center">
                         <i class="fas fa-calendar-alt text-cyan-400"></i>Session History
                     </h2>
                     
-                    <!-- Sub-tabs for History and Ask AI -->
                     <div class="flex gap-2 mb-6 border-b border-slate-700 pb-4">
-                        <button id="history-data-tab" class="history-subtab active px-6 py-3 rounded-xl font-semibold bg-emerald-600 text-white transition-all">
+                        <button id="history-data-tab" class="history-subtab active px-6 py-3 rounded-xl font-semibold text-white transition-all">
                             <i class="fas fa-table mr-2"></i>Session Data
                         </button>
-                        <button id="history-ai-tab" class="history-subtab px-6 py-3 rounded-xl font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
+                        <button id="history-ai-tab" class="history-subtab px-6 py-3 rounded-xl font-semibold text-slate-300 transition-all" style="background: #1e293b;">
                             <i class="fas fa-robot mr-2"></i>Ask AI
                         </button>
                     </div>
                     
-                    <!-- Session Data Sub-tab -->
                     <div id="history-data-content" class="history-subtab-content">
-                        <!-- Filters -->
-                        <div class="mb-6 flex flex-wrap gap-4 items-center bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+                        <div class="mb-6 flex flex-wrap gap-4 items-center p-4 rounded-xl border border-slate-700" style="background: rgba(15,23,42,0.8);">
                             <label class="text-slate-300 font-medium">Show:</label>
-                            <select id="history-filter" class="bg-slate-800 border border-slate-700 text-slate-200 px-3 py-2 rounded-lg focus:ring-emerald-500">
+                            <select id="history-filter" class="border border-slate-700 text-slate-200 px-3 py-2 rounded-lg focus:ring-emerald-500" style="background: #1e293b;">
                                 <option value="all">All Days</option>
                                 <option value="7">Last 7 Days</option>
                                 <option value="30">Last 30 Days</option>
                             </select>
                             
                             <div class="ml-auto flex gap-2">
-                                <button id="export-data-btn" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg border border-slate-600 transition-all text-slate-300 text-sm">
+                                <button id="export-data-btn" class="px-4 py-2 rounded-lg border border-slate-600 transition-all text-slate-300 text-sm" style="background: #1e293b;">
                                     <i class="fas fa-download mr-1"></i>Export CSV
                                 </button>
-                                <button id="clear-data-btn" class="bg-red-900 hover:bg-red-800 px-4 py-2 rounded-lg border border-red-700 transition-all text-slate-300 text-sm">
+                                <button id="clear-data-btn" class="px-4 py-2 rounded-lg border border-red-700 transition-all text-slate-300 text-sm" style="background: #7f1d1d;">
                                     <i class="fas fa-trash mr-1"></i>Reset All Data
                                 </button>
                             </div>
                         </div>
                         
-                        <!-- Session Table -->
                         <div class="overflow-x-auto mb-6">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-900 text-slate-300 text-sm uppercase tracking-wider">
+                                    <tr class="text-slate-300 text-sm uppercase tracking-wider" style="background: #0f172a;">
                                         <th class="px-4 py-3 border-b border-slate-700 rounded-tl-lg">Date</th>
                                         <th class="px-4 py-3 border-b border-slate-700">Start</th>
                                         <th class="px-4 py-3 border-b border-slate-700">End</th>
@@ -1116,7 +510,6 @@
                             </table>
                         </div>
                         
-                        <!-- Day Summary Cards -->
                         <h3 class="text-xl font-semibold text-slate-200 mb-4 border-l-4 border-cyan-500 pl-4">Daily Summaries</h3>
                         <div id="history-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="col-span-full text-center py-12 text-slate-500">
@@ -1127,10 +520,8 @@
                         </div>
                     </div>
                     
-                    <!-- Ask AI Sub-tab -->
                     <div id="history-ai-content" class="history-subtab-content hidden">
-                        <!-- AI Info Banner -->
-                        <div class="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-600/50 rounded-xl p-4 mb-6">
+                        <div class="border rounded-xl p-4 mb-6" style="background: linear-gradient(90deg, rgba(49,46,129,0.5), rgba(88,28,135,0.5)); border-color: rgba(99,102,241,0.5);">
                             <div class="flex items-start gap-3">
                                 <i class="fas fa-info-circle text-indigo-400 text-xl mt-1"></i>
                                 <div>
@@ -1140,12 +531,10 @@
                             </div>
                         </div>
                         
-                        <!-- Collapsible AI Panel -->
-                        <div class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-                            <!-- Panel Header (Clickable) -->
-                            <button id="ai-panel-toggle" class="w-full flex items-center justify-between p-5 text-left hover:bg-slate-800/50 transition-all">
+                        <div class="border border-slate-700 rounded-xl overflow-hidden" style="background: #0f172a;">
+                            <button id="ai-panel-toggle" class="w-full flex items-center justify-between p-5 text-left transition-all" style="background: transparent;">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
+                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(to bottom right, #4f46e5, #7c3aed);">
                                         <i class="fas fa-brain text-white text-xl"></i>
                                     </div>
                                     <div>
@@ -1156,12 +545,10 @@
                                 <i id="ai-panel-chevron" class="fas fa-chevron-down text-slate-400 text-xl transition-transform"></i>
                             </button>
                             
-                            <!-- Panel Content (Hidden by default) -->
                             <div id="ai-panel-content" class="hidden border-t border-slate-700">
-                                <!-- Date Range Selector -->
-                                <div class="p-5 bg-slate-900/50 border-b border-slate-700">
+                                <div class="p-5 border-b border-slate-700" style="background: rgba(15,23,42,0.5);">
                                     <label class="text-slate-400 text-sm font-medium mb-2 block">Analysis Date Range</label>
-                                    <select id="ai-date-range" class="bg-slate-800 border border-slate-700 text-slate-200 px-4 py-2 rounded-lg w-full max-w-xs">
+                                    <select id="ai-date-range" class="border border-slate-700 text-slate-200 px-4 py-2 rounded-lg w-full max-w-xs" style="background: #1e293b;">
                                         <option value="7">Last 7 Days</option>
                                         <option value="15">Last 15 Days</option>
                                         <option value="30">Last 30 Days</option>
@@ -1169,46 +556,42 @@
                                     </select>
                                 </div>
                                 
-                                <!-- Preset Command Buttons -->
                                 <div class="p-5">
                                     <h4 class="text-slate-300 font-semibold mb-4">Select Analysis Type</h4>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                                        <button class="ai-command-btn bg-slate-800 hover:bg-indigo-900/50 border border-slate-700 hover:border-indigo-500 p-4 rounded-xl text-left transition-all" data-command="summarize">
+                                        <button class="ai-command-btn border border-slate-700 p-4 rounded-xl text-left transition-all" style="background: #1e293b;" data-command="summarize">
                                             <i class="fas fa-chart-pie text-indigo-400 text-xl mb-2 block"></i>
                                             <span class="text-slate-200 font-medium block">Summarize Period</span>
                                             <span class="text-slate-500 text-sm">Overview of focus time, sessions, and productivity</span>
                                         </button>
-                                        <button class="ai-command-btn bg-slate-800 hover:bg-purple-900/50 border border-slate-700 hover:border-purple-500 p-4 rounded-xl text-left transition-all" data-command="compare">
+                                        <button class="ai-command-btn border border-slate-700 p-4 rounded-xl text-left transition-all" style="background: #1e293b;" data-command="compare">
                                             <i class="fas fa-balance-scale text-purple-400 text-xl mb-2 block"></i>
                                             <span class="text-slate-200 font-medium block">Compare Periods</span>
                                             <span class="text-slate-500 text-sm">First half vs second half comparison</span>
                                         </button>
-                                        <button class="ai-command-btn bg-slate-800 hover:bg-cyan-900/50 border border-slate-700 hover:border-cyan-500 p-4 rounded-xl text-left transition-all" data-command="peak-times">
+                                        <button class="ai-command-btn border border-slate-700 p-4 rounded-xl text-left transition-all" style="background: #1e293b;" data-command="peak-times">
                                             <i class="fas fa-clock text-cyan-400 text-xl mb-2 block"></i>
                                             <span class="text-slate-200 font-medium block">When Am I Most Focused?</span>
                                             <span class="text-slate-500 text-sm">Identify peak focus hours and days</span>
                                         </button>
-                                        <button class="ai-command-btn bg-slate-800 hover:bg-amber-900/50 border border-slate-700 hover:border-amber-500 p-4 rounded-xl text-left transition-all" data-command="consistency">
+                                        <button class="ai-command-btn border border-slate-700 p-4 rounded-xl text-left transition-all" style="background: #1e293b;" data-command="consistency">
                                             <i class="fas fa-exclamation-triangle text-amber-400 text-xl mb-2 block"></i>
                                             <span class="text-slate-200 font-medium block">What Is Hurting My Consistency?</span>
                                             <span class="text-slate-500 text-sm">Analyze break patterns and session drops</span>
                                         </button>
                                     </div>
                                     
-                                    <!-- AI Output Area -->
                                     <div id="ai-output-container" class="hidden">
                                         <div class="flex items-center justify-between mb-3">
                                             <h4 class="text-slate-300 font-semibold">Analysis Result</h4>
-                                            <button id="ai-clear-output" class="text-slate-500 hover:text-slate-300 text-sm">
+                                            <button id="ai-clear-output" class="text-slate-500 hover:text-slate-300 text-sm" style="background: transparent;">
                                                 <i class="fas fa-times mr-1"></i>Clear
                                             </button>
                                         </div>
-                                        <div id="ai-output" class="bg-slate-800 border border-slate-700 rounded-xl p-5 text-slate-300 leading-relaxed">
-                                            <!-- AI output will be inserted here -->
+                                        <div id="ai-output" class="border border-slate-700 rounded-xl p-5 text-slate-300 leading-relaxed" style="background: #1e293b;">
                                         </div>
                                     </div>
                                     
-                                    <!-- Loading State -->
                                     <div id="ai-loading" class="hidden text-center py-8">
                                         <i class="fas fa-spinner fa-spin text-indigo-400 text-3xl mb-3"></i>
                                         <p class="text-slate-400">Analyzing your data...</p>
@@ -1222,2106 +605,12 @@
             
         </main>
         
-        <!-- Footer -->
         <footer class="text-center mt-10 pt-8 border-t border-slate-800 text-slate-500 text-sm">
-            <p>&copy; 2026 Focus Flow. Build focused, track honestly.</p>
-            <p class="mt-2 text-xs">Session-based productivity •Do more of what matters.</p>
-            <p class="mt-2 text-xs">~Built by someone who believes in focus</p>
+            <p>&copy; 2024 Focus Flow. Build focused, track honestly.</p>
+            <p class="mt-2 text-xs">Session-based productivity • Local-first • Dark mode</p>
         </footer>
     </div>
     
-    <script>
-    // ====================
-    // CENTRAL STATE STORE
-    // ====================
-    const STORAGE_KEY = 'focus_flow_data';
-    const MIN_FOCUS_FOR_STREAK_MS = 45 * 60 * 1000; // 45 minutes minimum for streak
-    const PARTIAL_STREAK_RECOVERY_PERCENT = 0.25; // 25% recovery
-    const HISTORY_RENDER_LIMIT = 50; // Pagination limit for history rendering
-    
-    const store = {
-        currentTab: 'home',
-        homeState: 'idle',
-        activeSession: null,
-        pauseStart: null,
-        activeTaskId: null,
-        // Timer state - timestamp-based for accuracy (FIX #1: Timer Drift)
-        focusResumeTimestamp: null, // When focus was last resumed
-        accumulatedFocusMs: 0, // Focus time accumulated before current segment
-        tasks: [],
-        sessions: [],
-        dayLogs: [],
-        badges: {},
-        badgeChangesToday: {}, // Track badge changes per day to prevent flapping
-        records: {
-            longestSessionMs: 0,
-            longestSessionDate: null,
-            maxDailyFocusMs: 0,
-            maxDailyFocusDate: null,
-            longestUninterruptedFocusMs: 0
-        },
-        streak: {
-            current: 0,
-            longest: 0,
-            lastValidDate: null,
-            recoveryAvailable: false,
-            previousStreak: 0,
-            recoveryUsedToday: null // FIX #4: Track if recovery was used today
-        },
-        settings: {
-            minProductivityThreshold: 70
-        },
-        // Personalization
-        userProfile: {
-            username: '',
-            firstSessionDate: null
-        },
-        // FIX #2: Track event listener initialization
-        listenersInitialized: false
-    };
-    
-    // ====================
-    // USAGE-BASED LEVEL SYSTEM
-    // ====================
-    const levelDefinitions = [
-        { level: 1, title: 'Newcomer', minDays: 0 },
-        { level: 2, title: 'Getting Started', minDays: 3 },
-        { level: 3, title: 'Iron Focus', minDays: 7 },
-        { level: 4, title: 'Consistent', minDays: 14 },
-        { level: 5, title: 'Long Runner', minDays: 30 },
-        { level: 6, title: 'Veteran', minDays: 60 },
-        { level: 7, title: 'Legend', minDays: 100 }
-    ];
-    
-    function calculateUserLevel() {
-        // Level based ONLY on number of active days (days with at least one session)
-        // NOT based on focus time, productivity, streaks, or badges
-        const uniqueDays = new Set();
-        store.sessions.forEach(session => {
-            const dateKey = getSessionDateKey(session);
-            uniqueDays.add(dateKey);
-        });
-        
-        const activeDays = uniqueDays.size;
-        
-        // Find the highest level the user qualifies for
-        let currentLevel = levelDefinitions[0];
-        for (let i = levelDefinitions.length - 1; i >= 0; i--) {
-            if (activeDays >= levelDefinitions[i].minDays) {
-                currentLevel = levelDefinitions[i];
-                break;
-            }
-        }
-        
-        // Find next level
-        const nextLevelIndex = levelDefinitions.findIndex(l => l.level === currentLevel.level) + 1;
-        const nextLevel = nextLevelIndex < levelDefinitions.length ? levelDefinitions[nextLevelIndex] : null;
-        
-        return {
-            level: currentLevel.level,
-            title: currentLevel.title,
-            activeDays: activeDays,
-            nextLevel: nextLevel,
-            daysToNextLevel: nextLevel ? nextLevel.minDays - activeDays : 0
-        };
-    }
-    
-    function getDisplayName() {
-        const username = store.userProfile.username || 'User';
-        const levelInfo = calculateUserLevel();
-        return `${username}_${levelInfo.title.replace(/\s+/g, '')}`;
-    }
-
-    // ====================
-    // BADGE DEFINITIONS WITH EMOTIONAL DESCRIPTIONS
-    // ====================
-    const badgeDefinitions = [
-        // TIME BADGES (Permanent)
-        { id: 'first-drop', name: 'First Drop', description: 'Complete first 30 min focus session', meaning: 'Every great journey begins with a single drop of effort.', icon: 'fas fa-droplet', color: 'cyan', category: 'time', permanent: true },
-        { id: 'one-hour-club', name: 'One Hour Club', description: '1+ hour single sitting focus', meaning: 'You proved that sustained attention is your superpower.', icon: 'fas fa-hourglass-start', color: 'blue', category: 'time', permanent: true },
-        { id: 'deep-work', name: 'Deep Work', description: '2+ hour single sitting (minimal breaks)', meaning: 'You entered the zone where real breakthroughs happen.', icon: 'fas fa-brain', color: 'purple', category: 'time', permanent: true },
-        { id: 'beast-mode', name: 'Beast Mode', description: '3+ hour single sitting (no long breaks)', meaning: 'When others quit, you kept going. Unstoppable.', icon: 'fas fa-dragon', color: 'red', category: 'time', permanent: true },
-        // CONSISTENCY BADGES (Revocable)
-        { id: 'day-1-soldier', name: 'Day 1 Soldier', description: 'First valid streak day (70%+ productivity)', meaning: 'The hardest day is always day one. You showed up.', icon: 'fas fa-medal', color: 'yellow', category: 'consistency', permanent: false },
-        { id: 'on-fire', name: 'On Fire', description: '3-day streak', meaning: 'The flame is lit. Keep it burning.', icon: 'fas fa-fire', color: 'orange', category: 'consistency', permanent: false },
-        { id: 'habit-builder', name: 'Habit Builder', description: '7-day streak', meaning: 'You\'re no longer trying – you\'re becoming.', icon: 'fas fa-fire-flame-curved', color: 'amber', category: 'consistency', permanent: false },
-        { id: 'unstoppable', name: 'Unstoppable', description: '14+ day streak', meaning: 'Two weeks of discipline. You\'re a different person now.', icon: 'fas fa-infinity', color: 'emerald', category: 'consistency', permanent: false },
-        // PERFORMANCE BADGES (Revocable)
-        { id: 'efficient-mind', name: 'Efficient Mind', description: 'Daily productivity ≥ 70%', meaning: 'Quality over quantity. You respect your time.', icon: 'fas fa-bolt', color: 'yellow', category: 'performance', permanent: false },
-        { id: 'focus-sniper', name: 'Focus Sniper', description: 'Break time < 25% of session time', meaning: 'Precision focus. No wasted moments.', icon: 'fas fa-crosshairs', color: 'teal', category: 'performance', permanent: false },
-        { id: 'task-finisher', name: 'Task Finisher', description: '100% to-do completion in a day', meaning: 'You don\'t just start things – you finish them.', icon: 'fas fa-check-double', color: 'green', category: 'performance', permanent: false },
-        // RECORD BADGES (Permanent)
-        { id: 'new-best-focus', name: 'New Best Focus', description: 'Longest focus session ever', meaning: 'You pushed past your own limits. New record.', icon: 'fas fa-trophy', color: 'gold', category: 'record', permanent: true },
-        { id: 'personal-record', name: 'Personal Record', description: 'Highest daily focus time', meaning: 'Your best day yet. Tomorrow could be even better.', icon: 'fas fa-crown', color: 'purple', category: 'record', permanent: true },
-        // ROASTING BADGES (Revocable)
-        { id: 'break-monster', name: 'Break Monster', description: 'Break time > focus time in a session', meaning: 'The couch called. You answered. It happens.', icon: 'fas fa-cookie-bite', color: 'orange', category: 'roast', permanent: false },
-        { id: 'ghost-session', name: 'Ghost Session', description: 'Session with < 15 min focus', meaning: 'You were here... barely. Like a ghost.', icon: 'fas fa-ghost', color: 'gray', category: 'roast', permanent: false },
-        { id: 'consistency-who', name: 'Consistency Who?', description: 'Streak broken after ≥3 days', meaning: 'You had momentum. What happened?', icon: 'fas fa-face-frown', color: 'stone', category: 'roast', permanent: false }
-    ];
-
-    // ====================
-    // DATA PERSISTENCE
-    // ====================
-    function saveData() {
-        try {
-            const dataToSave = {
-                tasks: store.tasks,
-                sessions: store.sessions.map(s => ({
-                    ...s,
-                    session_start_datetime: s.session_start_datetime instanceof Date ? s.session_start_datetime.toISOString() : s.session_start_datetime,
-                    session_end_datetime: s.session_end_datetime instanceof Date ? s.session_end_datetime.toISOString() : s.session_end_datetime,
-                    pause_logs: s.pause_logs ? s.pause_logs.map(log => ({
-                        start: log.start instanceof Date ? log.start.toISOString() : log.start,
-                        end: log.end instanceof Date ? log.end.toISOString() : log.end
-                    })) : []
-                })),
-                dayLogs: store.dayLogs,
-                badges: store.badges,
-                badgeChangesToday: store.badgeChangesToday,
-                records: store.records,
-                streak: store.streak,
-                settings: store.settings,
-                userProfile: store.userProfile,
-                activeSession: store.activeSession ? {
-                    ...store.activeSession,
-                    session_start_datetime: store.activeSession.session_start_datetime instanceof Date ? store.activeSession.session_start_datetime.toISOString() : store.activeSession.session_start_datetime,
-                    session_end_datetime: store.activeSession.session_end_datetime instanceof Date ? store.activeSession.session_end_datetime.toISOString() : store.activeSession.session_end_datetime,
-                    pause_logs: store.activeSession.pause_logs ? store.activeSession.pause_logs.map(log => ({
-                        start: log.start instanceof Date ? log.start.toISOString() : log.start,
-                        end: log.end instanceof Date ? log.end.toISOString() : log.end
-                    })) : []
-                } : null,
-                pauseStart: store.pauseStart instanceof Date ? store.pauseStart.toISOString() : store.pauseStart,
-                activeTaskId: store.activeTaskId,
-                homeState: store.homeState,
-                // FIX #1: Save timer state for accurate restoration
-                accumulatedFocusMs: store.accumulatedFocusMs,
-                focusResumeTimestamp: store.focusResumeTimestamp instanceof Date ? store.focusResumeTimestamp.toISOString() : store.focusResumeTimestamp,
-                savedAt: new Date().toISOString()
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-        } catch (e) {
-            console.error('Error saving data:', e);
-        }
-    }
-
-    function loadData() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (!saved) return false;
-        try {
-            const data = JSON.parse(saved);
-            store.tasks = data.tasks || [];
-            store.sessions = (data.sessions || []).map(s => ({
-                ...s,
-                session_start_datetime: new Date(s.session_start_datetime),
-                session_end_datetime: s.session_end_datetime ? new Date(s.session_end_datetime) : null,
-                pause_logs: (s.pause_logs || []).map(log => ({
-                    start: new Date(log.start),
-                    end: new Date(log.end)
-                }))
-            }));
-            store.dayLogs = data.dayLogs || [];
-            store.badges = data.badges || initializeBadges();
-            store.badgeChangesToday = data.badgeChangesToday || {};
-            store.records = data.records || { longestSessionMs: 0, longestSessionDate: null, maxDailyFocusMs: 0, maxDailyFocusDate: null, longestUninterruptedFocusMs: 0 };
-            store.streak = data.streak || { current: 0, longest: 0, lastValidDate: null, recoveryAvailable: false, previousStreak: 0, recoveryUsedToday: null };
-            store.settings = data.settings || { minProductivityThreshold: 70 };
-            store.userProfile = data.userProfile || { username: '', firstSessionDate: null };
-            
-            // FIX #3: Restore active session in PAUSED state for safety
-            if (data.activeSession) {
-                store.activeSession = {
-                    ...data.activeSession,
-                    session_start_datetime: new Date(data.activeSession.session_start_datetime),
-                    session_end_datetime: data.activeSession.session_end_datetime ? new Date(data.activeSession.session_end_datetime) : null,
-                    pause_logs: (data.activeSession.pause_logs || []).map(log => ({
-                        start: new Date(log.start),
-                        end: new Date(log.end)
-                    }))
-                };
-                
-                // FIX #1: Restore accumulated focus time
-                store.accumulatedFocusMs = data.accumulatedFocusMs || 0;
-                
-                // Always set pauseStart to now when restoring (ensures safe state)
-                // FIX #3: Session always restores paused - user must manually resume
-                store.pauseStart = new Date();
-                store.focusResumeTimestamp = null; // Clear - session is paused
-                store.activeTaskId = data.activeTaskId;
-                store.homeState = 'paused'; // Always restore to paused for user safety
-                
-                console.log('Session restored in paused state. Please resume or end session.');
-            }
-            
-            // FIX #3: Validate activeTaskId exists in tasks list
-            validateActiveTask();
-            
-            // Reset badge changes if it's a new day
-            const todayKey = getTodayKey();
-            if (!store.badgeChangesToday[todayKey]) {
-                store.badgeChangesToday = { [todayKey]: {} };
-            }
-            
-            // FIX #4: Reset recovery flag if it's a new day
-            if (store.streak.recoveryUsedToday && store.streak.recoveryUsedToday !== todayKey) {
-                store.streak.recoveryUsedToday = null;
-            }
-            
-            return true;
-        } catch (e) {
-            console.error('Error loading data:', e);
-            return false;
-        }
-    }
-
-    function initializeBadges() {
-        const badges = {};
-        badgeDefinitions.forEach(def => {
-            badges[def.id] = { isActive: false, earnedAt: null, lostAt: null, reason: null };
-        });
-        return badges;
-    }
-
-    function clearAllData() {
-        if (confirm('Are you sure you want to delete ALL data? This cannot be undone.')) {
-            localStorage.removeItem(STORAGE_KEY);
-            location.reload();
-        }
-    }
-
-    // ====================
-    // CORE UTILITY FUNCTIONS
-    // ====================
-    function formatDuration(ms, short = false) {
-        if (!ms && ms !== 0) return short ? '0m' : '00:00:00';
-        const totalSeconds = Math.floor(Math.abs(ms) / 1000);
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        if (short) {
-            if (hours > 0) return `${hours}h ${minutes}m`;
-            return `${minutes}m`;
-        }
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-
-    function getTodayKey() {
-        return new Date().toISOString().split('T')[0];
-    }
-
-    function getYesterdayKey() {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        return yesterday.toISOString().split('T')[0];
-    }
-    
-    function getSessionDateKey(session) {
-        // For sessions spanning midnight, assign to date with majority focus time
-        const startDate = new Date(session.session_start_datetime);
-        const endDate = session.session_end_datetime ? new Date(session.session_end_datetime) : new Date();
-        
-        const startDateKey = startDate.toISOString().split('T')[0];
-        const endDateKey = endDate.toISOString().split('T')[0];
-        
-        // If same day, return that day
-        if (startDateKey === endDateKey) return startDateKey;
-        
-        // Calculate focus time on each day
-        const midnight = new Date(endDateKey + 'T00:00:00');
-        const msBeforeMidnight = midnight - startDate;
-        const msAfterMidnight = endDate - midnight;
-        
-        // Return date with more time
-        return msBeforeMidnight > msAfterMidnight ? startDateKey : endDateKey;
-    }
-    
-    // FIX #3: Enhanced task validation to prevent orphaned activeTaskId
-    function validateActiveTask() {
-        // If activeTaskId doesn't exist in tasks, clear it
-        if (store.activeTaskId) {
-            const taskExists = store.tasks.some(t => t.id === store.activeTaskId);
-            if (!taskExists) {
-                console.warn('Active task no longer exists, clearing activeTaskId');
-                store.activeTaskId = null;
-                // Try to set first available pending task
-                const pendingTask = store.tasks.find(t => t.status !== 'done');
-                if (pendingTask) {
-                    store.activeTaskId = pendingTask.id;
-                    console.log('Auto-selected new active task:', pendingTask.title);
-                }
-                saveData();
-            }
-        }
-    }
-    
-    // FIX #6: Safe state guards - prevent invalid state transitions
-    function canStartSession() {
-        return !store.activeSession;
-    }
-    
-    function canPauseSession() {
-        return store.activeSession && !store.pauseStart && store.homeState === 'focus';
-    }
-    
-    function canResumeSession() {
-        return store.activeSession && store.pauseStart && store.homeState === 'paused';
-    }
-    
-    function canEndSession() {
-        return store.activeSession !== null;
-    }
-
-    // ====================
-    // FOCUS INTEGRITY SCORE
-    // ====================
-    function calculateIntegrityScore() {
-        const todayStats = getTodayStats();
-        if (todayStats.totalAnchorMs === 0) return 0;
-        
-        // Component 1: Focus/Anchor ratio (0-40 points)
-        const ratioScore = Math.min(40, Math.round((todayStats.totalFocusMs / todayStats.totalAnchorMs) * 40));
-        
-        // Component 2: Average break length (0-30 points) - shorter is better
-        let avgBreakScore = 30;
-        if (todayStats.sessions > 0) {
-            const todayKey = getTodayKey();
-            const todaySessions = store.sessions.filter(s => getSessionDateKey(s) === todayKey);
-            let totalBreaks = 0;
-            let totalBreakMs = 0;
-            
-            todaySessions.forEach(s => {
-                if (s.pause_logs) {
-                    s.pause_logs.forEach(log => {
-                        totalBreaks++;
-                        totalBreakMs += (new Date(log.end) - new Date(log.start));
-                    });
-                }
-            });
-            
-            if (totalBreaks > 0) {
-                const avgBreakMs = totalBreakMs / totalBreaks;
-                const avgBreakMins = avgBreakMs / 60000;
-                // Optimal: < 5 mins, Acceptable: 5-15 mins, Poor: > 15 mins
-                if (avgBreakMins <= 5) avgBreakScore = 30;
-                else if (avgBreakMins <= 10) avgBreakScore = 25;
-                else if (avgBreakMins <= 15) avgBreakScore = 15;
-                else avgBreakScore = 5;
-            }
-        }
-        
-        // Component 3: Longest uninterrupted focus segment (0-30 points)
-        let longestSegmentScore = 0;
-        const todayKey = getTodayKey();
-        const todaySessions = store.sessions.filter(s => getSessionDateKey(s) === todayKey);
-        let longestFocusMs = 0;
-        
-        todaySessions.forEach(s => {
-            if (s.pause_logs && s.pause_logs.length > 0) {
-                // Calculate focus segments
-                let prevEnd = new Date(s.session_start_datetime);
-                s.pause_logs.forEach(log => {
-                    const segmentMs = new Date(log.start) - prevEnd;
-                    if (segmentMs > longestFocusMs) longestFocusMs = segmentMs;
-                    prevEnd = new Date(log.end);
-                });
-                // Last segment
-                const lastSegmentMs = (s.session_end_datetime ? new Date(s.session_end_datetime) : new Date()) - prevEnd;
-                if (lastSegmentMs > longestFocusMs) longestFocusMs = lastSegmentMs;
-            } else if (s.total_focus_duration > longestFocusMs) {
-                longestFocusMs = s.total_focus_duration;
-            }
-        });
-        
-        const longestMins = longestFocusMs / 60000;
-        if (longestMins >= 60) longestSegmentScore = 30;
-        else if (longestMins >= 45) longestSegmentScore = 25;
-        else if (longestMins >= 30) longestSegmentScore = 20;
-        else if (longestMins >= 15) longestSegmentScore = 10;
-        else longestSegmentScore = 5;
-        
-        // Update record
-        if (longestFocusMs > store.records.longestUninterruptedFocusMs) {
-            store.records.longestUninterruptedFocusMs = longestFocusMs;
-        }
-        
-        return Math.min(100, ratioScore + avgBreakScore + longestSegmentScore);
-    }
-
-    // ====================
-    // STATS CALCULATION
-    // ====================
-    function calculateStats() {
-        const stats = {
-            totalFocusMs: 0, totalBreakMs: 0, totalAnchorMs: 0,
-            productivityPercent: 0, taskCompletionPercent: 0,
-            sessionsCount: store.sessions.length,
-            completedTasks: store.tasks.filter(t => t.status === 'done').length,
-            totalTasks: store.tasks.length, longestBreakMs: 0,
-            todaySessions: 0, todayFocusMs: 0, todayBreakMs: 0, todayAnchorMs: 0,
-            daysActive: 0, avgProductivity: 0, lifetimeTasksDone: 0
-        };
-
-        const uniqueDays = new Set();
-        store.sessions.forEach(session => {
-            const focusMs = session.total_focus_duration || 0;
-            const breakMs = session.total_pause_duration || 0;
-            stats.totalFocusMs += focusMs;
-            stats.totalBreakMs += breakMs;
-            const sessionDate = getSessionDateKey(session);
-            uniqueDays.add(sessionDate);
-            
-            if (session.pause_logs && session.pause_logs.length > 0) {
-                session.pause_logs.forEach(log => {
-                    const breakDuration = new Date(log.end) - new Date(log.start);
-                    if (breakDuration > stats.longestBreakMs) stats.longestBreakMs = breakDuration;
-                });
-            }
-        });
-
-        stats.totalAnchorMs = stats.totalFocusMs + stats.totalBreakMs;
-        stats.productivityPercent = stats.totalAnchorMs > 0 ? Math.round((stats.totalFocusMs / stats.totalAnchorMs) * 100) : 0;
-        stats.taskCompletionPercent = stats.totalTasks > 0 ? Math.round((stats.completedTasks / stats.totalTasks) * 100) : 0;
-        stats.daysActive = uniqueDays.size;
-        stats.avgProductivity = stats.totalAnchorMs > 0 ? Math.round((stats.totalFocusMs / stats.totalAnchorMs) * 100) : 0;
-        
-        // Count lifetime tasks done from day logs
-        store.dayLogs.forEach(log => {
-            stats.lifetimeTasksDone += log.completedTasks || 0;
-        });
-
-        const todayKey = getTodayKey();
-        store.sessions.forEach(session => {
-            const sessionDate = getSessionDateKey(session);
-            if (sessionDate === todayKey) {
-                stats.todaySessions++;
-                stats.todayFocusMs += session.total_focus_duration || 0;
-                stats.todayBreakMs += session.total_pause_duration || 0;
-            }
-        });
-        stats.todayAnchorMs = stats.todayFocusMs + stats.todayBreakMs;
-
-        return stats;
-    }
-
-    function getTodayStats() {
-        const todayKey = getTodayKey();
-        const todaySessions = store.sessions.filter(s => getSessionDateKey(s) === todayKey);
-
-        let totalFocusMs = 0, totalBreakMs = 0, longestBreakMs = 0;
-        todaySessions.forEach(session => {
-            totalFocusMs += session.total_focus_duration || 0;
-            totalBreakMs += session.total_pause_duration || 0;
-            if (session.pause_logs && session.pause_logs.length > 0) {
-                session.pause_logs.forEach(log => {
-                    const breakDuration = new Date(log.end) - new Date(log.start);
-                    if (breakDuration > longestBreakMs) longestBreakMs = breakDuration;
-                });
-            }
-        });
-
-        const totalAnchorMs = totalFocusMs + totalBreakMs;
-        const productivityPercent = totalAnchorMs > 0 ? Math.round((totalFocusMs / totalAnchorMs) * 100) : 0;
-
-        return {
-            sessions: todaySessions.length, totalFocusMs, totalBreakMs, totalAnchorMs, longestBreakMs, productivityPercent,
-            completedTasks: store.tasks.filter(t => t.status === 'done').length, totalTasks: store.tasks.length
-        };
-    }
-
-    // ====================
-    // STREAK CALCULATION WITH ANTI-CHEAT
-    // ====================
-    function calculateStreak() {
-        const todayKey = getTodayKey();
-        const yesterdayKey = getYesterdayKey();
-        const threshold = store.settings.minProductivityThreshold;
-        
-        // Group sessions by date
-        const sessionsByDate = {};
-        store.sessions.forEach(session => {
-            const dateKey = getSessionDateKey(session);
-            if (!sessionsByDate[dateKey]) {
-                sessionsByDate[dateKey] = [];
-            }
-            sessionsByDate[dateKey].push(session);
-        });
-        
-        // Check if a day is valid for streak (anti-cheat: must have real focus time)
-        function isDayValidForStreak(dateKey) {
-            const daySessions = sessionsByDate[dateKey];
-            if (!daySessions || daySessions.length === 0) return false;
-            
-            let dayFocusMs = 0, dayAnchorMs = 0;
-            daySessions.forEach(s => {
-                dayFocusMs += s.total_focus_duration || 0;
-                dayAnchorMs += (s.total_focus_duration || 0) + (s.total_pause_duration || 0);
-            });
-            
-            // Anti-cheat: Must have at least 15 mins focus to count
-            if (dayFocusMs < 15 * 60 * 1000) return false;
-            
-            const dayProductivity = dayAnchorMs > 0 ? (dayFocusMs / dayAnchorMs) * 100 : 0;
-            return dayProductivity >= threshold;
-        }
-        
-        const todayValid = isDayValidForStreak(todayKey);
-        const yesterdayValid = isDayValidForStreak(yesterdayKey);
-        
-        // If neither today nor yesterday is valid, check for streak recovery
-        if (!todayValid && !yesterdayValid) {
-            // Check if recovery is possible
-            if (store.streak.current > 0 || store.streak.previousStreak >= 3) {
-                return {
-                    current: 0,
-                    longest: store.streak.longest,
-                    lastValidDate: store.streak.lastValidDate,
-                    recoveryAvailable: store.streak.previousStreak >= 3,
-                    previousStreak: store.streak.previousStreak || store.streak.current
-                };
-            }
-            return { current: 0, longest: store.streak.longest, lastValidDate: null, recoveryAvailable: false, previousStreak: 0 };
-        }
-        
-        // Count streak days
-        let currentStreak = 0;
-        let checkDate = todayValid ? new Date(todayKey) : new Date(yesterdayKey);
-        let lastValidDate = null;
-
-        while (true) {
-            const dateKey = checkDate.toISOString().split('T')[0];
-            
-            if (isDayValidForStreak(dateKey)) {
-                currentStreak++;
-                lastValidDate = dateKey;
-                checkDate.setDate(checkDate.getDate() - 1);
-            } else {
-                break;
-            }
-        }
-
-        return {
-            current: Math.max(currentStreak, 0),
-            longest: Math.max(store.streak.longest, currentStreak),
-            lastValidDate: lastValidDate,
-            recoveryAvailable: false,
-            previousStreak: currentStreak > 0 ? currentStreak : store.streak.previousStreak
-        };
-    }
-    
-    // FIX #4: Partial streak recovery with single-use per streak break
-    function attemptStreakRecovery() {
-        const todayKey = getTodayKey();
-        
-        // FIX #4: Check if recovery was already used today
-        if (store.streak.recoveryUsedToday === todayKey) {
-            console.log('Streak recovery already used today');
-            return false;
-        }
-        
-        // Check if recovery is available
-        if (!store.streak.recoveryAvailable) {
-            return false;
-        }
-        
-        const todayStats = getTodayStats();
-        
-        // Must have at least MIN_FOCUS_FOR_STREAK_MS focus time today
-        if (todayStats.totalFocusMs < MIN_FOCUS_FOR_STREAK_MS) {
-            return false;
-        }
-        
-        // Must have valid productivity
-        if (todayStats.productivityPercent < store.settings.minProductivityThreshold) {
-            return false;
-        }
-        
-        // Calculate recovered streak (25% of previous)
-        const recoveredStreak = Math.floor(store.streak.previousStreak * PARTIAL_STREAK_RECOVERY_PERCENT);
-        
-        if (recoveredStreak >= 1) {
-            store.streak.current = recoveredStreak;
-            store.streak.recoveryAvailable = false;
-            // FIX #4: Mark recovery as used - cannot use again until next streak break
-            store.streak.recoveryUsedToday = todayKey;
-            console.log(`Streak partially recovered: ${recoveredStreak} days`);
-            saveData();
-            return true;
-        }
-        
-        return false;
-    }
-
-    function updateRecords(session) {
-        if (session.total_focus_duration > store.records.longestSessionMs) {
-            store.records.longestSessionMs = session.total_focus_duration;
-            store.records.longestSessionDate = new Date(session.session_start_datetime).toISOString();
-        }
-
-        const todayStats = getTodayStats();
-        if (todayStats.totalFocusMs > store.records.maxDailyFocusMs) {
-            store.records.maxDailyFocusMs = todayStats.totalFocusMs;
-            store.records.maxDailyFocusDate = getTodayKey();
-        }
-    }
-
-    // ====================
-    // BADGE SYSTEM WITH FLAPPING PREVENTION
-    // ====================
-    function updateBadges() {
-        const todayKey = getTodayKey();
-        const newBadges = {};
-        
-        // Initialize today's badge changes if needed
-        if (!store.badgeChangesToday[todayKey]) {
-            store.badgeChangesToday = { [todayKey]: {} };
-        }
-
-        badgeDefinitions.forEach(badge => {
-            const wasActive = store.badges[badge.id]?.isActive || false;
-            const nowActive = evaluateBadge(badge.id);
-            const changedToday = store.badgeChangesToday[todayKey][badge.id] || false;
-            
-            if (nowActive && !wasActive) {
-                // Earning badge
-                if (!changedToday) {
-                    newBadges[badge.id] = { 
-                        isActive: true, 
-                        earnedAt: new Date().toISOString(), 
-                        lostAt: null, 
-                        reason: getBadgeReason(badge.id, true) 
-                    };
-                    store.badgeChangesToday[todayKey][badge.id] = true;
-                    console.log(`✓ Badge earned: ${badge.name}`);
-                } else {
-                    // Already changed today, keep current state
-                    newBadges[badge.id] = store.badges[badge.id] || { isActive: false, earnedAt: null, lostAt: null, reason: null };
-                }
-            } else if (!nowActive && wasActive && !badge.permanent) {
-                // Losing badge (only for non-permanent)
-                if (!changedToday) {
-                    newBadges[badge.id] = { 
-                        ...store.badges[badge.id], 
-                        isActive: false, 
-                        lostAt: new Date().toISOString(), 
-                        reason: getBadgeReason(badge.id, false) 
-                    };
-                    store.badgeChangesToday[todayKey][badge.id] = true;
-                    console.log(`✗ Badge lost: ${badge.name}`);
-                } else {
-                    // Already changed today, keep current state
-                    newBadges[badge.id] = store.badges[badge.id];
-                }
-            } else {
-                newBadges[badge.id] = store.badges[badge.id] || { isActive: false, earnedAt: null, lostAt: null, reason: null };
-            }
-        });
-
-        store.badges = newBadges;
-        saveData();
-        renderBadges();
-    }
-
-    function evaluateBadge(badgeId) {
-        const stats = calculateStats();
-        const todayStats = getTodayStats();
-        
-        switch (badgeId) {
-            case 'first-drop': 
-                return store.sessions.some(s => s.total_focus_duration >= 30 * 60 * 1000);
-            case 'one-hour-club': 
-                return store.sessions.some(s => s.total_focus_duration >= 60 * 60 * 1000);
-            case 'deep-work': 
-                return store.sessions.some(s => {
-                    const focusMs = s.total_focus_duration || 0;
-                    const breakMs = s.total_pause_duration || 0;
-                    return focusMs >= 2 * 60 * 60 * 1000 && (breakMs === 0 || (breakMs / focusMs) < 0.3);
-                });
-            case 'beast-mode': 
-                return store.sessions.some(s => {
-                    const focusMs = s.total_focus_duration || 0;
-                    const breakMs = s.total_pause_duration || 0;
-                    return focusMs >= 3 * 60 * 60 * 1000 && (breakMs === 0 || (breakMs / focusMs) < 0.2);
-                });
-            case 'day-1-soldier': 
-                return store.streak.current >= 1;
-            case 'on-fire': 
-                return store.streak.current >= 3;
-            case 'habit-builder': 
-                return store.streak.current >= 7;
-            case 'unstoppable': 
-                return store.streak.current >= 14;
-            case 'efficient-mind': 
-                return todayStats.totalAnchorMs > 0 && todayStats.productivityPercent >= 70;
-            case 'focus-sniper': 
-                return store.sessions.some(s => { 
-                    const anchorMs = (s.total_focus_duration || 0) + (s.total_pause_duration || 0); 
-                    return anchorMs > 0 && s.total_pause_duration > 0 && (s.total_pause_duration / anchorMs) < 0.25; 
-                });
-            case 'task-finisher': 
-                return stats.totalTasks > 0 && stats.completedTasks === stats.totalTasks;
-            case 'new-best-focus': 
-                return store.records.longestSessionMs > 0;
-            case 'personal-record': 
-                return store.records.maxDailyFocusMs > 0;
-            case 'break-monster': 
-                return store.sessions.some(s => s.total_focus_duration > 0 && s.total_pause_duration > s.total_focus_duration);
-            case 'ghost-session': 
-                return store.sessions.some(s => s.total_focus_duration > 0 && s.total_focus_duration < 15 * 60 * 1000);
-            case 'consistency-who': 
-                return store.streak.longest >= 3 && store.streak.current === 0;
-            default: 
-                return false;
-        }
-    }
-
-    function getBadgeReason(badgeId, earned) {
-        const badge = badgeDefinitions.find(b => b.id === badgeId);
-        if (badge && earned) {
-            return badge.meaning;
-        }
-        
-        const lostReasons = {
-            'efficient-mind': 'Productivity dropped below 70%',
-            'focus-sniper': 'Breaks increased beyond 25%',
-            'task-finisher': 'Task completion dropped',
-            'day-1-soldier': 'Streak broken',
-            'on-fire': 'Streak broken',
-            'habit-builder': 'Streak broken',
-            'unstoppable': 'Streak broken',
-            'break-monster': 'Back to productive balance',
-            'ghost-session': 'Sessions are getting longer',
-            'consistency-who': 'Time to rebuild!'
-        };
-        return lostReasons[badgeId] || (earned ? 'Achievement unlocked!' : 'Not earned yet');
-    }
-
-    // ====================
-    // UI UPDATE FUNCTIONS
-    // ====================
-    function updateUserProfileUI() {
-        const levelInfo = calculateUserLevel();
-        const displayName = getDisplayName();
-        
-        // Update header badge
-        const headerDisplayName = document.getElementById('header-display-name');
-        if (headerDisplayName) {
-            headerDisplayName.textContent = displayName;
-        }
-        
-        // Update profile page
-        const profileDisplayName = document.getElementById('profile-display-name');
-        if (profileDisplayName) {
-            profileDisplayName.textContent = displayName;
-        }
-        
-        const profileLevelInfo = document.getElementById('profile-level-info');
-        if (profileLevelInfo) {
-            profileLevelInfo.textContent = `Level ${levelInfo.level} • ${levelInfo.activeDays} active days`;
-        }
-        
-        // Update username input
-        const usernameInput = document.getElementById('username-input');
-        if (usernameInput && !usernameInput.matches(':focus')) {
-            usernameInput.value = store.userProfile.username || '';
-        }
-        
-        // Update username display state (collapsed or editing)
-        updateUsernameDisplayState();
-        
-        // Update level progress bar
-        const levelProgressBar = document.getElementById('level-progress-bar');
-        const levelProgressText = document.getElementById('level-progress-text');
-        
-        if (levelInfo.nextLevel) {
-            const currentLevelDays = levelDefinitions.find(l => l.level === levelInfo.level)?.minDays || 0;
-            const daysInCurrentLevel = levelInfo.activeDays - currentLevelDays;
-            const daysNeededForNext = levelInfo.nextLevel.minDays - currentLevelDays;
-            const progressPercent = Math.min(100, Math.round((daysInCurrentLevel / daysNeededForNext) * 100));
-            
-            if (levelProgressBar) {
-                levelProgressBar.style.width = `${progressPercent}%`;
-            }
-            if (levelProgressText) {
-                levelProgressText.textContent = `${levelInfo.daysToNextLevel} days to ${levelInfo.nextLevel.title}`;
-            }
-        } else {
-            // Max level reached
-            if (levelProgressBar) {
-                levelProgressBar.style.width = '100%';
-            }
-            if (levelProgressText) {
-                levelProgressText.textContent = 'Max level reached! 🎉';
-            }
-        }
-    }
-    
-    function saveUsername() {
-        const usernameInput = document.getElementById('username-input');
-        if (usernameInput) {
-            const newUsername = usernameInput.value.trim().replace(/[^a-zA-Z0-9_\-\s]/g, '').substring(0, 20);
-            store.userProfile.username = newUsername;
-            saveData();
-            updateUserProfileUI();
-            updateUsernameDisplayState();
-        }
-    }
-    
-    function updateUsernameDisplayState() {
-        const usernameDisplay = document.getElementById('username-display');
-        const usernameEdit = document.getElementById('username-edit');
-        const usernameText = document.getElementById('username-text');
-        const cancelBtn = document.getElementById('cancel-username-edit');
-        
-        if (!usernameDisplay || !usernameEdit) return;
-        
-        if (store.userProfile.username && store.userProfile.username.trim() !== '') {
-            // Show collapsed display with pencil icon
-            usernameDisplay.classList.remove('hidden');
-            usernameEdit.classList.add('hidden');
-            usernameText.textContent = store.userProfile.username;
-        } else {
-            // Show edit input
-            usernameDisplay.classList.add('hidden');
-            usernameEdit.classList.remove('hidden');
-            if (cancelBtn) cancelBtn.classList.add('hidden');
-        }
-    }
-    
-    function showUsernameEdit() {
-        const usernameDisplay = document.getElementById('username-display');
-        const usernameEdit = document.getElementById('username-edit');
-        const usernameInput = document.getElementById('username-input');
-        const cancelBtn = document.getElementById('cancel-username-edit');
-        
-        if (usernameDisplay) usernameDisplay.classList.add('hidden');
-        if (usernameEdit) usernameEdit.classList.remove('hidden');
-        if (cancelBtn) cancelBtn.classList.remove('hidden');
-        if (usernameInput) {
-            usernameInput.value = store.userProfile.username || '';
-            usernameInput.focus();
-        }
-    }
-    
-    function cancelUsernameEdit() {
-        updateUsernameDisplayState();
-    }
-    
-    function updateAllUI() {
-        const stats = calculateStats();
-        const integrityScore = calculateIntegrityScore();
-        
-        // Update user profile UI
-        updateUserProfileUI();
-        
-        document.getElementById('quick-focus').textContent = formatDuration(stats.todayFocusMs, true);
-        document.getElementById('quick-completion').textContent = `${stats.taskCompletionPercent}%`;
-        document.getElementById('sessions-count').textContent = stats.todaySessions;
-        document.getElementById('todo-percent').textContent = `${stats.taskCompletionPercent}%`;
-        document.getElementById('todo-progress').style.width = `${stats.taskCompletionPercent}%`;
-        document.getElementById('integrity-score').textContent = integrityScore;
-        
-        document.getElementById('profile-total-focus').textContent = formatDuration(stats.totalFocusMs, true);
-        document.getElementById('profile-days-active').textContent = stats.daysActive;
-        document.getElementById('profile-tasks-done').textContent = stats.lifetimeTasksDone || stats.completedTasks;
-        document.getElementById('profile-avg-productivity').textContent = `${stats.avgProductivity}%`;
-        document.getElementById('profile-streak').innerHTML = `${store.streak.current} <span class="text-base text-blue-300">days</span>`;
-        document.getElementById('profile-longest-streak').innerHTML = `Longest streak: <span class="font-semibold">${store.streak.longest} days</span>`;
-        
-        // Show streak recovery option
-        const recoveryEl = document.getElementById('profile-streak-recovery');
-        if (store.streak.recoveryAvailable && store.streak.previousStreak >= 3) {
-            recoveryEl.classList.remove('hidden');
-            recoveryEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i>Streak recovery available! Focus ${formatDuration(MIN_FOCUS_FOR_STREAK_MS, true)}+ today to recover ${Math.floor(store.streak.previousStreak * PARTIAL_STREAK_RECOVERY_PERCENT)} days.`;
-        } else {
-            recoveryEl.classList.add('hidden');
-        }
-        
-        // Update rank
-        let rank = 'Newcomer';
-        let rankNext = 'Complete your first session to advance';
-        if (stats.sessionsCount >= 1) { rank = 'Iron Focus'; rankNext = 'Next: Bronze Focus (5 sessions)'; }
-        if (stats.sessionsCount >= 5) { rank = 'Bronze Focus'; rankNext = 'Next: Silver Focus (10 sessions)'; }
-        if (stats.sessionsCount >= 10) { rank = 'Silver Focus'; rankNext = 'Next: Gold Focus (25 sessions)'; }
-        if (stats.sessionsCount >= 25) { rank = 'Gold Focus'; rankNext = 'You\'re a focus master!'; }
-        document.getElementById('profile-rank').textContent = rank;
-        document.getElementById('profile-rank-next').textContent = rankNext;
-        
-        updateFocusUI();
-        updatePausedUI();
-        updateActiveTaskDisplay();
-    }
-
-    function updateFocusUI() {
-        if (!store.activeSession) return;
-        const now = new Date();
-        const focusMs = store.activeSession.total_focus_duration || 0;
-        const anchorMs = now - store.activeSession.session_start_datetime;
-        const productivity = anchorMs ? Math.round((focusMs / anchorMs) * 100) : 0;
-
-        document.getElementById('focus-timer').textContent = formatDuration(focusMs);
-        document.getElementById('anchor-hint').textContent = formatDuration(anchorMs);
-        document.getElementById('focus-productivity').textContent = `${productivity}%`;
-        document.getElementById('focus-segments').textContent = store.activeSession.break_count || 0;
-        document.getElementById('focus-progress').style.width = `${Math.min(productivity, 100)}%`;
-        document.getElementById('focus-tasks-done').textContent = store.tasks.filter(t => t.status === 'done').length;
-    }
-
-    function updatePausedUI() {
-        if (!store.activeSession) return;
-        const now = new Date();
-        const focusMs = store.activeSession.total_focus_duration || 0;
-        const anchorMs = now - store.activeSession.session_start_datetime;
-        const productivity = anchorMs ? Math.round((focusMs / anchorMs) * 100) : 0;
-
-        document.getElementById('paused-focus').textContent = formatDuration(focusMs);
-        document.getElementById('paused-anchor').textContent = formatDuration(anchorMs);
-        document.getElementById('paused-productivity').textContent = `${productivity}%`;
-    }
-
-    function updateActiveTaskDisplay() {
-        const activeTask = store.tasks.find(t => t.id === store.activeTaskId);
-        const taskTitle = activeTask ? activeTask.title : 'No task selected - click to choose';
-        
-        const focusTitle = document.getElementById('active-task-title');
-        const pausedTitle = document.getElementById('paused-active-task-title');
-        
-        if (focusTitle) focusTitle.textContent = taskTitle;
-        if (pausedTitle) pausedTitle.textContent = taskTitle;
-    }
-
-    function updateSummaryUI() {
-        const todayStats = getTodayStats();
-        const today = new Date();
-        const integrityScore = calculateIntegrityScore();
-        
-        // Personalized greeting
-        const username = store.userProfile.username || 'there';
-        const greetingEl = document.getElementById('summary-user-greeting');
-        if (greetingEl) {
-            if (todayStats.productivityPercent >= 80) {
-                greetingEl.textContent = `Outstanding work, ${username}!`;
-            } else if (todayStats.productivityPercent >= 60) {
-                greetingEl.textContent = `Great effort today, ${username}!`;
-            } else if (todayStats.productivityPercent >= 40) {
-                greetingEl.textContent = `Keep pushing, ${username}!`;
-            } else {
-                greetingEl.textContent = `Every session counts, ${username}!`;
-            }
-        }
-        
-        document.getElementById('summary-date').textContent = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('summary-focus').textContent = formatDuration(todayStats.totalFocusMs, true);
-        document.getElementById('summary-anchor').textContent = formatDuration(todayStats.totalAnchorMs, true);
-        document.getElementById('summary-productivity').textContent = `${todayStats.productivityPercent}%`;
-        document.getElementById('summary-integrity').textContent = integrityScore;
-        document.getElementById('summary-sessions').innerHTML = `<i class="fas fa-calendar-check text-cyan-400 mr-2"></i>${todayStats.sessions} Completed Sessions`;
-        document.getElementById('summary-longest-break').textContent = `Longest break: ${formatDuration(todayStats.longestBreakMs, true)}`;
-        
-        // Streak info
-        const streakInfo = document.getElementById('summary-streak-info');
-        if (store.streak.current > 0) {
-            streakInfo.innerHTML = `<i class="fas fa-fire text-orange-400 mr-1"></i>Current streak: ${store.streak.current} days`;
-        } else if (store.streak.recoveryAvailable) {
-            streakInfo.innerHTML = `<i class="fas fa-exclamation-triangle text-amber-400 mr-1"></i>Streak broken. Recovery available!`;
-        } else {
-            streakInfo.innerHTML = `<i class="fas fa-info-circle text-slate-400 mr-1"></i>Start building your streak!`;
-        }
-        
-        document.getElementById('summary-tasks').innerHTML = `<i class="fas fa-check text-emerald-400 mr-1"></i>${todayStats.completedTasks} of ${todayStats.totalTasks}`;
-        const taskPercent = todayStats.totalTasks > 0 ? Math.round((todayStats.completedTasks / todayStats.totalTasks) * 100) : 0;
-        document.getElementById('summary-task-percent').textContent = `${taskPercent}%`;
-        document.getElementById('summary-task-bar').style.width = `${taskPercent}%`;
-    }
-
-    function renderBadges() {
-        const container = document.getElementById('badges-container');
-        if (!container) return;
-        
-        container.innerHTML = '';
-        badgeDefinitions.forEach(badge => {
-            const badgeState = store.badges[badge.id] || { isActive: false, reason: null };
-            const isRoast = badge.category === 'roast';
-            
-            const badgeEl = document.createElement('div');
-            badgeEl.className = `rounded-2xl p-4 text-center border transition-all cursor-pointer hover:scale-105 ${badgeState.isActive ? (isRoast ? 'badge-roast border-amber-600/50' : 'badge-active border-emerald-500/50') : 'badge-inactive border-slate-700 opacity-60'}`;
-            
-            const colorClass = badgeState.isActive ? '300' : '600';
-            badgeEl.innerHTML = `
-                <i class="${badge.icon} text-3xl mb-2 block" style="color: var(--tw-${badge.color}-${colorClass}, #64748b)"></i>
-                <p class="font-semibold text-sm ${badgeState.isActive ? 'text-white' : 'text-slate-400'}">${badge.name}</p>
-                <p class="text-xs ${badgeState.isActive ? 'text-white/80' : 'text-slate-500'}">${badge.description}</p>
-                ${badgeState.isActive && badgeState.reason ? `<p class="text-xs mt-2 ${isRoast ? 'text-amber-200' : 'text-emerald-200'} italic">"${badgeState.reason}"</p>` : ''}
-            `;
-            badgeEl.title = badge.meaning;
-            container.appendChild(badgeEl);
-        });
-    }
-
-    function renderHistory() {
-        const container = document.getElementById('history-cards');
-        if (!container) return;
-        
-        const filterValue = document.getElementById('history-filter')?.value || 'all';
-        
-        // Also render the table
-        renderHistoryTable();
-        
-        if (store.sessions.length === 0) {
-            container.innerHTML = `
-                <div class="col-span-full text-center py-12 text-slate-500">
-                    <i class="fas fa-history text-4xl mb-4 opacity-50"></i>
-                    <p class="text-lg">No session history yet</p>
-                    <p class="text-sm mt-2">Complete your first focus session to see it here</p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Group sessions by date
-        const sessionsByDate = {};
-        store.sessions.forEach(session => {
-            const dateKey = getSessionDateKey(session);
-            if (!sessionsByDate[dateKey]) {
-                sessionsByDate[dateKey] = { sessions: [], totalFocusMs: 0, totalAnchorMs: 0 };
-            }
-            sessionsByDate[dateKey].sessions.push(session);
-            sessionsByDate[dateKey].totalFocusMs += session.total_focus_duration || 0;
-            sessionsByDate[dateKey].totalAnchorMs += (session.total_focus_duration || 0) + (session.total_pause_duration || 0);
-        });
-        
-        // Filter by date range
-        let filteredDates = Object.keys(sessionsByDate).sort().reverse();
-        if (filterValue !== 'all') {
-            const daysAgo = parseInt(filterValue);
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
-            const cutoffKey = cutoffDate.toISOString().split('T')[0];
-            filteredDates = filteredDates.filter(d => d >= cutoffKey);
-        }
-        
-        // FIX #5: Limit to prevent performance issues with large datasets
-        filteredDates = filteredDates.slice(0, HISTORY_RENDER_LIMIT);
-
-        container.innerHTML = '';
-        filteredDates.forEach(dateKey => {
-            const dayData = sessionsByDate[dateKey];
-            const date = new Date(dateKey + 'T00:00:00');
-            const productivity = dayData.totalAnchorMs > 0 ? Math.round((dayData.totalFocusMs / dayData.totalAnchorMs) * 100) : 0;
-            
-            const dayCard = document.createElement('div');
-            dayCard.className = 'bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-xl border border-slate-700 hover:border-emerald-500 transition-all';
-            dayCard.innerHTML = `
-                <h3 class="text-xl font-semibold text-slate-200 mb-3 flex items-center gap-2">
-                    <i class="fas fa-calendar-day text-emerald-400"></i>${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-                </h3>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="text-center">
-                        <i class="fas fa-brain text-slate-400 mb-1"></i>
-                        <p class="text-slate-400 text-sm">Focus</p>
-                        <p class="text-emerald-400 font-bold text-xl">${formatDuration(dayData.totalFocusMs, true)}</p>
-                    </div>
-                    <div class="text-center">
-                        <i class="fas fa-percentage text-slate-400 mb-1"></i>
-                        <p class="text-slate-400 text-sm">Productivity</p>
-                        <p class="text-slate-200 font-bold text-xl">${productivity}%</p>
-                    </div>
-                </div>
-                <div class="text-sm text-slate-300">
-                    <i class="fas fa-layer-group mr-2"></i>${dayData.sessions.length} session${dayData.sessions.length !== 1 ? 's' : ''}
-                </div>
-            `;
-            container.appendChild(dayCard);
-        });
-        
-        if (filteredDates.length === 0) {
-            container.innerHTML = `
-                <div class="col-span-full text-center py-12 text-slate-500">
-                    <i class="fas fa-filter text-4xl mb-4 opacity-50"></i>
-                    <p class="text-lg">No sessions in this time range</p>
-                </div>
-            `;
-        }
-    }
-
-    // ====================
-    // TASK MANAGEMENT
-    // ====================
-    function renderTasks() {
-        const list = document.getElementById('task-list');
-        const pausedList = document.getElementById('paused-task-list');
-        const empty = document.getElementById('empty-tasks');
-        const focusOptions = document.getElementById('focus-task-options');
-
-        if (!list) return;
-        list.innerHTML = '';
-        if (pausedList) pausedList.innerHTML = '';
-        if (focusOptions) focusOptions.innerHTML = '';
-
-        if (store.tasks.length === 0) {
-            if (empty) empty.classList.remove('hidden');
-            return;
-        }
-        if (empty) empty.classList.add('hidden');
-
-        store.tasks.forEach(task => {
-            // Main task list (idle state)
-            const item = document.createElement('div');
-            item.className = `task-item bg-slate-900 rounded-xl p-4 border border-slate-700 transition-all hover:border-emerald-500 cursor-pointer ${task.status === 'done' ? 'task-complete' : ''} ${task.id === store.activeTaskId ? 'active-task' : ''}`;
-            item.innerHTML = `
-                <div class="flex items-center gap-3 w-full">
-                    <input type="checkbox" class="task-checkbox w-6 h-6 accent-emerald-500 cursor-pointer" ${task.status === 'done' ? 'checked' : ''}>
-                    <span class="text-slate-200 text-lg font-medium task-title flex-1">${task.title}</span>
-                    <button class="delete-task text-red-400 hover:text-red-300 px-2 py-1 rounded transition-all" title="Delete task">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                    <span class="px-3 py-1 ${task.id === store.activeTaskId ? 'bg-emerald-600' : (task.status === 'done' ? 'bg-emerald-700' : 'bg-amber-600')} text-xs rounded-full text-white">
-                        ${task.id === store.activeTaskId ? 'Active' : (task.status === 'done' ? 'Done' : 'Pending')}
-                    </span>
-                </div>
-            `;
-            
-            const checkbox = item.querySelector('.task-checkbox');
-            checkbox.addEventListener('change', (e) => {
-                e.stopPropagation();
-                toggleTask(task.id);
-            });
-            checkbox.addEventListener('click', (e) => e.stopPropagation());
-            
-            const deleteBtn = item.querySelector('.delete-task');
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                deleteTask(task.id);
-            });
-            
-            item.addEventListener('click', (e) => {
-                if (!e.target.closest('.task-checkbox') && !e.target.closest('.delete-task')) {
-                    setActiveTask(task.id);
-                }
-            });
-            
-            list.appendChild(item);
-
-            // Paused state task list
-            if (pausedList) {
-                const pausedItem = document.createElement('div');
-                pausedItem.className = `task-item bg-slate-900 rounded-xl p-4 border border-slate-700 transition-all hover:border-emerald-500 cursor-pointer ${task.status === 'done' ? 'task-complete' : ''} ${task.id === store.activeTaskId ? 'active-task' : ''}`;
-                pausedItem.innerHTML = `
-                    <div class="flex items-center gap-3 w-full">
-                        <input type="checkbox" class="task-checkbox w-6 h-6 accent-emerald-500 cursor-pointer" ${task.status === 'done' ? 'checked' : ''}>
-                        <span class="text-slate-200 text-lg font-medium task-title flex-1">${task.title}</span>
-                        <span class="px-3 py-1 ${task.id === store.activeTaskId ? 'bg-emerald-600' : (task.status === 'done' ? 'bg-emerald-700' : 'bg-amber-600')} text-xs rounded-full text-white">
-                            ${task.id === store.activeTaskId ? 'Active' : (task.status === 'done' ? 'Done' : 'Pending')}
-                        </span>
-                    </div>
-                `;
-                
-                const pCheckbox = pausedItem.querySelector('.task-checkbox');
-                pCheckbox.addEventListener('change', (e) => {
-                    e.stopPropagation();
-                    toggleTask(task.id);
-                });
-                pCheckbox.addEventListener('click', (e) => e.stopPropagation());
-                
-                pausedItem.addEventListener('click', (e) => {
-                    if (!e.target.closest('.task-checkbox')) {
-                        setActiveTask(task.id);
-                    }
-                });
-                
-                pausedList.appendChild(pausedItem);
-            }
-
-            // Focus state task selector
-            if (focusOptions) {
-                const option = document.createElement('div');
-                option.className = `p-3 rounded-lg border cursor-pointer transition-all ${task.id === store.activeTaskId ? 'bg-emerald-700 border-emerald-500' : 'bg-slate-800 border-slate-700 hover:border-emerald-500'}`;
-                option.innerHTML = `<span class="text-slate-200">${task.title}</span>${task.id === store.activeTaskId ? ' <i class="fas fa-check text-emerald-300 ml-2"></i>' : ''}`;
-                option.onclick = () => {
-                    setActiveTask(task.id);
-                    hideTaskSelectorInFocus();
-                };
-                focusOptions.appendChild(option);
-            }
-        });
-    }
-
-    function addTask(title) {
-        if (!title.trim()) return;
-        const task = { id: crypto.randomUUID(), title: title.trim(), status: 'pending', createdAt: new Date().toISOString() };
-        store.tasks.push(task);
-        renderTasks();
-        updateAllUI();
-        saveData();
-    }
-
-    function toggleTask(id) {
-        const task = store.tasks.find(t => t.id === id);
-        if (!task) return;
-        task.status = task.status === 'done' ? 'pending' : 'done';
-        renderTasks();
-        updateAllUI();
-        saveData();
-    }
-    
-    function deleteTask(id) {
-        const taskIndex = store.tasks.findIndex(t => t.id === id);
-        if (taskIndex === -1) return;
-        
-        // If deleting active task, clear activeTaskId
-        if (store.activeTaskId === id) {
-            store.activeTaskId = null;
-            // Try to set another pending task as active
-            const pendingTask = store.tasks.find(t => t.id !== id && t.status !== 'done');
-            if (pendingTask) {
-                store.activeTaskId = pendingTask.id;
-            }
-        }
-        
-        store.tasks.splice(taskIndex, 1);
-        renderTasks();
-        updateAllUI();
-        updateActiveTaskDisplay();
-        saveData();
-    }
-
-    function setActiveTask(id) {
-        store.activeTaskId = id;
-        renderTasks();
-        updateActiveTaskDisplay();
-        saveData();
-    }
-
-    function showTaskSelectorInFocus() {
-        document.getElementById('focus-task-selector').classList.remove('hidden');
-        renderTasks(); // Refresh task options
-    }
-
-    function hideTaskSelectorInFocus() {
-        document.getElementById('focus-task-selector').classList.add('hidden');
-    }
-
-    // ====================
-    // SESSION MANAGEMENT
-    // ====================
-    function startSession() {
-        // FIX #6: Safe state guard
-        if (!canStartSession()) {
-            console.warn('Cannot start session: session already active');
-            return;
-        }
-        
-        const now = new Date();
-        const session = {
-            id: crypto.randomUUID(),
-            session_start_datetime: now,
-            session_end_datetime: null,
-            total_focus_duration: 0,
-            total_pause_duration: 0,
-            break_count: 0,
-            pause_logs: [],
-            focused_task_id: store.activeTaskId
-        };
-
-        store.activeSession = session;
-        store.pauseStart = null;
-        store.homeState = 'focus';
-        
-        // FIX #1: Initialize timestamp-based timer state
-        store.focusResumeTimestamp = now;
-        store.accumulatedFocusMs = 0;
-        
-        // Track first session date for level system
-        if (!store.userProfile.firstSessionDate) {
-            store.userProfile.firstSessionDate = now.toISOString();
-        }
-        
-        saveData();
-        switchHomeState('focus');
-        renderTasks();
-    }
-
-    function pauseSession() {
-        // FIX #6: Safe state guard
-        if (!canPauseSession()) {
-            console.warn('Cannot pause session: no active focus session or already paused');
-            return;
-        }
-        
-        const now = new Date();
-        
-        // FIX #1: Calculate and store accumulated focus time before pausing
-        if (store.focusResumeTimestamp) {
-            const currentSegmentMs = now - store.focusResumeTimestamp;
-            store.accumulatedFocusMs += currentSegmentMs;
-        }
-        
-        store.pauseStart = now;
-        store.focusResumeTimestamp = null; // Clear - we're paused
-        store.activeSession.break_count += 1;
-        store.homeState = 'paused';
-        
-        saveData();
-        switchHomeState('paused');
-    }
-
-    function resumeSession() {
-        // FIX #6: Safe state guard
-        if (!canResumeSession()) {
-            console.warn('Cannot resume session: no paused session');
-            return;
-        }
-        
-        const now = new Date();
-        
-        store.activeSession.pause_logs.push({ start: store.pauseStart, end: now });
-        store.pauseStart = null;
-        
-        // FIX #1: Set new focus resume timestamp
-        store.focusResumeTimestamp = now;
-        store.homeState = 'focus';
-        
-        saveData();
-        switchHomeState('focus');
-    }
-
-    function endSession() {
-        // FIX #6: Safe state guard
-        if (!canEndSession()) {
-            console.warn('Cannot end session: no active session');
-            return;
-        }
-
-        const now = new Date();
-        
-        // FIX #1: Calculate final focus time using timestamps
-        let finalFocusMs = store.accumulatedFocusMs;
-        if (store.focusResumeTimestamp && !store.pauseStart) {
-            // Currently in focus mode, add current segment
-            finalFocusMs += (now - store.focusResumeTimestamp);
-        }
-
-        if (store.pauseStart) {
-            store.activeSession.pause_logs.push({ start: store.pauseStart, end: now });
-            store.pauseStart = null;
-        }
-
-        store.activeSession.session_end_datetime = now;
-
-        const totalPause = store.activeSession.pause_logs.reduce((sum, log) => {
-            return sum + (new Date(log.end) - new Date(log.start));
-        }, 0);
-        const anchorDuration = now - store.activeSession.session_start_datetime;
-        
-        // FIX #1: Use timestamp-calculated focus duration
-        const focusDuration = Math.max(finalFocusMs, 0);
-
-        store.activeSession.total_pause_duration = totalPause;
-        store.activeSession.total_focus_duration = focusDuration;
-
-        // Add session to history
-        store.sessions.push(store.activeSession);
-        
-        updateRecords(store.activeSession);
-
-        // FIX #4: Update day log using proper date assignment for midnight-spanning sessions
-        const sessionDateKey = getSessionDateKey(store.activeSession);
-        let dayLog = store.dayLogs.find(log => log.date === sessionDateKey);
-        if (!dayLog) {
-            dayLog = { date: sessionDateKey, totalFocusMs: 0, totalAnchorMs: 0, completedTasks: 0, totalTasks: store.tasks.length, sessions: [] };
-            store.dayLogs.push(dayLog);
-        }
-        
-        dayLog.totalFocusMs += focusDuration;
-        dayLog.totalAnchorMs += anchorDuration;
-        dayLog.completedTasks = store.tasks.filter(t => t.status === 'done').length;
-        dayLog.totalTasks = store.tasks.length;
-        dayLog.sessions.push(store.activeSession.id);
-
-        // Check for streak recovery
-        if (store.streak.recoveryAvailable) {
-            attemptStreakRecovery();
-        }
-        
-        store.streak = calculateStreak();
-        
-        // Clear session state
-        store.activeSession = null;
-        store.focusResumeTimestamp = null;
-        store.accumulatedFocusMs = 0;
-        store.homeState = 'idle';
-        
-        updateBadges();
-        updateAllUI();
-        renderHistory();
-        updateSummaryUI();
-        saveData();
-        switchHomeState('summary');
-    }
-
-    function switchHomeState(newState) {
-        document.querySelectorAll('#home .state-content').forEach(state => state.classList.add('hidden'));
-        const stateElement = document.getElementById(`${newState}-state`);
-        if (stateElement) {
-            stateElement.classList.remove('hidden');
-            store.homeState = newState;
-            if (newState === 'summary') updateSummaryUI();
-        }
-        updateAllUI();
-        renderTasks();
-    }
-
-    function continueDay() {
-        switchHomeState('idle');
-    }
-
-    function startNewDay() {
-        store.tasks = [];
-        store.activeTaskId = null;
-        renderTasks();
-        updateAllUI();
-        saveData();
-        switchHomeState('idle');
-    }
-
-    // FIX #1: Timestamp-based timer calculation (immune to browser throttling/drift)
-    function updateTimers() {
-        if (store.activeSession) {
-            const now = new Date();
-            const sessionStart = store.activeSession.session_start_datetime;
-            
-            // Calculate anchor time (always running from session start)
-            const anchorMs = now - sessionStart;
-            
-            // FIX #1: Calculate focus time using accumulated + current segment
-            let focusMs = store.accumulatedFocusMs || 0;
-            if (store.focusResumeTimestamp && !store.pauseStart) {
-                // Currently in focus mode, add current segment
-                focusMs += (now - store.focusResumeTimestamp);
-            }
-            
-            // Calculate total pause time from logs
-            let totalPauseMs = 0;
-            if (store.activeSession.pause_logs && store.activeSession.pause_logs.length > 0) {
-                totalPauseMs = store.activeSession.pause_logs.reduce((sum, log) => {
-                    return sum + (new Date(log.end) - new Date(log.start));
-                }, 0);
-            }
-            // Add current pause if paused
-            if (store.pauseStart) {
-                totalPauseMs += (now - store.pauseStart);
-            }
-            
-            // Store calculated values
-            store.activeSession.total_focus_duration = Math.max(focusMs, 0);
-            store.activeSession.total_pause_duration = totalPauseMs;
-            
-            updateFocusUI();
-            updatePausedUI();
-        }
-    }
-
-    // ====================
-    // EVENT LISTENERS
-    // FIX #2: Use function to attach listeners ONCE, using onclick to prevent duplicates
-    // ====================
-    function initializeEventListeners() {
-        // Prevent duplicate initialization
-        if (store.listenersInitialized) {
-            console.warn('Event listeners already initialized');
-            return;
-        }
-        store.listenersInitialized = true;
-        
-        // Navigation tabs
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.onclick = function(e) {
-                e.preventDefault();
-                document.querySelectorAll('.nav-tab').forEach(t => {
-                    t.classList.remove('active');
-                    t.querySelector('.nav-link').classList.remove('nav-active');
-                    t.querySelector('.nav-link').classList.add('text-slate-300');
-                });
-                this.classList.add('active');
-                this.querySelector('.nav-link').classList.add('nav-active');
-                this.querySelector('.nav-link').classList.remove('text-slate-300');
-                store.currentTab = this.dataset.tab;
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                    content.classList.add('hidden');
-                });
-                const tabContent = document.getElementById(store.currentTab);
-                if (tabContent) {
-                    tabContent.classList.remove('hidden');
-                    tabContent.classList.add('active');
-                    if (store.currentTab === 'history') renderHistory();
-                    if (store.currentTab === 'profile') { updateAllUI(); renderBadges(); }
-                }
-            };
-        });
-
-        // FIX #2: Use onclick assignment to prevent duplicate handlers
-        document.getElementById('add-task').onclick = function() {
-            const taskInput = document.getElementById('new-task');
-            if (taskInput) { addTask(taskInput.value); taskInput.value = ''; taskInput.focus(); }
-        };
-
-        document.getElementById('new-task').onkeypress = function(e) {
-            if (e.key === 'Enter') { addTask(this.value); this.value = ''; }
-        };
-
-        document.getElementById('start-session').onclick = startSession;
-        document.getElementById('finish-day').onclick = function() {
-            if (store.sessions.length === 0) {
-                alert('You need to complete at least one session before finishing the day.');
-                return;
-            }
-            updateBadges();
-            updateSummaryUI();
-            renderHistory();
-            switchHomeState('summary');
-        };
-        document.getElementById('pause-session').onclick = pauseSession;
-        document.getElementById('resume-session').onclick = resumeSession;
-        document.getElementById('end-session').onclick = endSession;
-        document.getElementById('end-session-paused').onclick = endSession;
-        document.getElementById('continue-day').onclick = continueDay;
-        document.getElementById('new-day').onclick = startNewDay;
-        document.getElementById('clear-data-btn').onclick = clearAllData;
-        
-        document.getElementById('history-filter').onchange = renderHistory;
-        
-        // History sub-tab switching
-        document.getElementById('history-data-tab').onclick = function() {
-            document.querySelectorAll('.history-subtab').forEach(t => {
-                t.classList.remove('active');
-                t.classList.add('bg-slate-800', 'text-slate-300');
-                t.classList.remove('bg-emerald-600', 'text-white');
-            });
-            this.classList.add('active', 'bg-emerald-600', 'text-white');
-            this.classList.remove('bg-slate-800', 'text-slate-300');
-            document.getElementById('history-data-content').classList.remove('hidden');
-            document.getElementById('history-ai-content').classList.add('hidden');
-        };
-        
-        document.getElementById('history-ai-tab').onclick = function() {
-            document.querySelectorAll('.history-subtab').forEach(t => {
-                t.classList.remove('active');
-                t.classList.add('bg-slate-800', 'text-slate-300');
-                t.classList.remove('bg-emerald-600', 'text-white');
-            });
-            this.classList.add('active', 'bg-emerald-600', 'text-white');
-            this.classList.remove('bg-slate-800', 'text-slate-300');
-            document.getElementById('history-ai-content').classList.remove('hidden');
-            document.getElementById('history-data-content').classList.add('hidden');
-        };
-        
-        // AI Panel Toggle
-        document.getElementById('ai-panel-toggle').onclick = function() {
-            const content = document.getElementById('ai-panel-content');
-            const chevron = document.getElementById('ai-panel-chevron');
-            content.classList.toggle('hidden');
-            chevron.classList.toggle('rotated');
-        };
-        
-        // AI Command Buttons
-        document.querySelectorAll('.ai-command-btn').forEach(btn => {
-            btn.onclick = function() {
-                const command = this.dataset.command;
-                runAIAnalysis(command);
-            };
-        });
-        
-        // AI Clear Output
-        document.getElementById('ai-clear-output').onclick = function() {
-            document.getElementById('ai-output-container').classList.add('hidden');
-            document.getElementById('ai-output').innerHTML = '';
-        };
-        
-        // Export CSV
-        document.getElementById('export-data-btn').onclick = exportHistoryToCSV;
-        
-        // Username save and edit
-        document.getElementById('save-username').onclick = saveUsername;
-        document.getElementById('username-input').onkeypress = function(e) {
-            if (e.key === 'Enter') {
-                saveUsername();
-                this.blur();
-            }
-        };
-        document.getElementById('edit-username-btn').onclick = showUsernameEdit;
-        document.getElementById('cancel-username-edit').onclick = cancelUsernameEdit;
-        
-        console.log('Event listeners initialized');
-    }
-
-    // ====================
-    // TABULAR DATA MODEL
-    // ====================
-    function getSessionTableData(filterDays = 'all') {
-        // Build structured rows for history table
-        const rows = [];
-        
-        let filteredSessions = [...store.sessions];
-        
-        // Apply date filter
-        if (filterDays !== 'all') {
-            const daysAgo = parseInt(filterDays);
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
-            filteredSessions = filteredSessions.filter(s => {
-                const sessionDate = new Date(s.session_start_datetime);
-                return sessionDate >= cutoffDate;
-            });
-        }
-        
-        filteredSessions.forEach(session => {
-            const startDate = new Date(session.session_start_datetime);
-            const endDate = session.session_end_datetime ? new Date(session.session_end_datetime) : null;
-            
-            // Calculate longest focus segment
-            let longestFocusMs = 0;
-            if (session.pause_logs && session.pause_logs.length > 0) {
-                let prevEnd = new Date(session.session_start_datetime);
-                session.pause_logs.forEach(log => {
-                    const segmentMs = new Date(log.start) - prevEnd;
-                    if (segmentMs > longestFocusMs) longestFocusMs = segmentMs;
-                    prevEnd = new Date(log.end);
-                });
-                // Last segment
-                if (endDate) {
-                    const lastSegmentMs = endDate - new Date(session.pause_logs[session.pause_logs.length - 1].end);
-                    if (lastSegmentMs > longestFocusMs) longestFocusMs = lastSegmentMs;
-                }
-            } else {
-                longestFocusMs = session.total_focus_duration || 0;
-            }
-            
-            // Get tasks worked on
-            const activeTask = store.tasks.find(t => t.id === session.focused_task_id);
-            const tasksWorkedOn = activeTask ? activeTask.title : 'No task assigned';
-            
-            // Calculate focus integrity for session
-            const anchorMs = (session.total_focus_duration || 0) + (session.total_pause_duration || 0);
-            const focusRatio = anchorMs > 0 ? (session.total_focus_duration / anchorMs) : 0;
-            const integrityScore = Math.round(focusRatio * 100);
-            
-            rows.push({
-                sessionId: session.id,
-                sessionDate: startDate.toISOString().split('T')[0],
-                sessionStartTime: startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-                sessionEndTime: endDate ? endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '--',
-                totalAnchorDuration: Math.round(anchorMs / 60000), // in minutes
-                totalFocusDuration: Math.round((session.total_focus_duration || 0) / 60000),
-                breakCount: session.break_count || 0,
-                longestFocusSegment: Math.round(longestFocusMs / 60000),
-                tasksWorkedOn: tasksWorkedOn,
-                tasksCompletedCount: store.tasks.filter(t => t.status === 'done').length,
-                focusIntegrityScore: integrityScore
-            });
-        });
-        
-        // Sort by date descending, then by start time
-        rows.sort((a, b) => {
-            if (a.sessionDate !== b.sessionDate) {
-                return b.sessionDate.localeCompare(a.sessionDate);
-            }
-            return b.sessionStartTime.localeCompare(a.sessionStartTime);
-        });
-        
-        return rows;
-    }
-    
-    // FIX #5: History table rendering with pagination for performance
-    function renderHistoryTable() {
-        const tableBody = document.getElementById('history-table-body');
-        if (!tableBody) return;
-        
-        const filterValue = document.getElementById('history-filter')?.value || 'all';
-        const allRows = getSessionTableData(filterValue);
-        
-        if (allRows.length === 0) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="9" class="px-4 py-12 text-center text-slate-500">
-                        <i class="fas fa-history text-4xl mb-4 opacity-50 block"></i>
-                        <p class="text-lg">No session history yet</p>
-                        <p class="text-sm mt-2">Complete your first focus session to see it here</p>
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-        
-        // FIX #5: Limit rendered rows for performance
-        const rows = allRows.slice(0, HISTORY_RENDER_LIMIT);
-        const hasMore = allRows.length > HISTORY_RENDER_LIMIT;
-        
-        let html = rows.map(row => `
-            <tr class="history-table-row border-b border-slate-800 hover:bg-slate-800/50 transition-all">
-                <td class="px-4 py-3 text-emerald-400 font-medium">${row.sessionDate}</td>
-                <td class="px-4 py-3">${row.sessionStartTime}</td>
-                <td class="px-4 py-3">${row.sessionEndTime}</td>
-                <td class="px-4 py-3">${row.totalAnchorDuration}m</td>
-                <td class="px-4 py-3 text-emerald-400 font-semibold">${row.totalFocusDuration}m</td>
-                <td class="px-4 py-3">${row.breakCount}</td>
-                <td class="px-4 py-3">${row.longestFocusSegment}m</td>
-                <td class="px-4 py-3 text-sm max-w-32 truncate" title="${row.tasksWorkedOn}">${row.tasksWorkedOn}</td>
-                <td class="px-4 py-3">
-                    <span class="px-2 py-1 rounded text-xs font-semibold ${row.focusIntegrityScore >= 70 ? 'bg-emerald-900 text-emerald-300' : row.focusIntegrityScore >= 50 ? 'bg-amber-900 text-amber-300' : 'bg-red-900 text-red-300'}">
-                        ${row.focusIntegrityScore}%
-                    </span>
-                </td>
-            </tr>
-        `).join('');
-        
-        // Show message if more data exists
-        if (hasMore) {
-            html += `
-                <tr>
-                    <td colspan="9" class="px-4 py-4 text-center text-slate-500 text-sm">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        Showing ${HISTORY_RENDER_LIMIT} of ${allRows.length} sessions. Export CSV for full data.
-                    </td>
-                </tr>
-            `;
-        }
-        
-        tableBody.innerHTML = html;
-    }
-    
-    function exportHistoryToCSV() {
-        const rows = getSessionTableData('all');
-        if (rows.length === 0) {
-            alert('No session data to export.');
-            return;
-        }
-        
-        const headers = ['Date', 'Start Time', 'End Time', 'Anchor (min)', 'Focus (min)', 'Break Count', 'Longest Focus (min)', 'Tasks', 'Integrity Score'];
-        const csvContent = [
-            headers.join(','),
-            ...rows.map(row => [
-                row.sessionDate,
-                row.sessionStartTime,
-                row.sessionEndTime,
-                row.totalAnchorDuration,
-                row.totalFocusDuration,
-                row.breakCount,
-                row.longestFocusSegment,
-                `"${row.tasksWorkedOn.replace(/"/g, '""')}"`,
-                row.focusIntegrityScore
-            ].join(','))
-        ].join('\n');
-        
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `focus-flow-history-${new Date().toISOString().split('T')[0]}.csv`;
-        link.click();
-    }
-
-    // ====================
-    // AI ANALYSIS SYSTEM
-    // ====================
-    function getAggregatedDataForAI(daysFilter) {
-        // Get session data for AI analysis (read-only)
-        const rows = getSessionTableData(daysFilter);
-        
-        // Aggregate by date
-        const byDate = {};
-        rows.forEach(row => {
-            if (!byDate[row.sessionDate]) {
-                byDate[row.sessionDate] = {
-                    date: row.sessionDate,
-                    sessions: 0,
-                    totalFocusMinutes: 0,
-                    totalAnchorMinutes: 0,
-                    totalBreaks: 0,
-                    longestFocus: 0,
-                    avgIntegrity: 0
-                };
-            }
-            byDate[row.sessionDate].sessions++;
-            byDate[row.sessionDate].totalFocusMinutes += row.totalFocusDuration;
-            byDate[row.sessionDate].totalAnchorMinutes += row.totalAnchorDuration;
-            byDate[row.sessionDate].totalBreaks += row.breakCount;
-            if (row.longestFocusSegment > byDate[row.sessionDate].longestFocus) {
-                byDate[row.sessionDate].longestFocus = row.longestFocusSegment;
-            }
-        });
-        
-        // Calculate averages
-        Object.values(byDate).forEach(day => {
-            day.productivity = day.totalAnchorMinutes > 0 ? Math.round((day.totalFocusMinutes / day.totalAnchorMinutes) * 100) : 0;
-        });
-        
-        return {
-            sessions: rows,
-            dailyAggregates: Object.values(byDate).sort((a, b) => b.date.localeCompare(a.date)),
-            totalSessions: rows.length,
-            totalDays: Object.keys(byDate).length
-        };
-    }
-    
-    function runAIAnalysis(command) {
-        const loading = document.getElementById('ai-loading');
-        const outputContainer = document.getElementById('ai-output-container');
-        const output = document.getElementById('ai-output');
-        
-        // Show loading
-        loading.classList.remove('hidden');
-        outputContainer.classList.add('hidden');
-        
-        // Get date range
-        const dateRange = document.getElementById('ai-date-range').value;
-        const data = getAggregatedDataForAI(dateRange);
-        
-        // Simulate AI processing (local analysis)
-        setTimeout(() => {
-            loading.classList.add('hidden');
-            
-            let result = '';
-            
-            switch (command) {
-                case 'summarize':
-                    result = generateSummaryAnalysis(data, dateRange);
-                    break;
-                case 'compare':
-                    result = generateComparisonAnalysis(data);
-                    break;
-                case 'peak-times':
-                    result = generatePeakTimesAnalysis(data);
-                    break;
-                case 'consistency':
-                    result = generateConsistencyAnalysis(data);
-                    break;
-                default:
-                    result = '<p class="text-slate-400">Unknown command.</p>';
-            }
-            
-            output.innerHTML = result;
-            outputContainer.classList.remove('hidden');
-        }, 800);
-    }
-    
-    function generateSummaryAnalysis(data, dateRange) {
-        if (data.totalSessions === 0) {
-            return `<p class="text-slate-400"><i class="fas fa-info-circle mr-2"></i>No session data available for the selected period.</p>`;
-        }
-        
-        const totalFocus = data.sessions.reduce((sum, s) => sum + s.totalFocusDuration, 0);
-        const totalAnchor = data.sessions.reduce((sum, s) => sum + s.totalAnchorDuration, 0);
-        const avgProductivity = totalAnchor > 0 ? Math.round((totalFocus / totalAnchor) * 100) : 0;
-        const avgFocusPerDay = data.totalDays > 0 ? Math.round(totalFocus / data.totalDays) : 0;
-        const avgSessionsPerDay = data.totalDays > 0 ? (data.totalSessions / data.totalDays).toFixed(1) : 0;
-        const totalBreaks = data.sessions.reduce((sum, s) => sum + s.breakCount, 0);
-        
-        const periodLabel = dateRange === 'all' ? 'all time' : `the last ${dateRange} days`;
-        
-        return `
-            <div class="space-y-4">
-                <p class="text-slate-200 font-medium"><i class="fas fa-chart-bar text-indigo-400 mr-2"></i>Summary for ${periodLabel}</p>
-                <ul class="ai-output-list">
-                    <li><i class="fas fa-layer-group text-cyan-400"></i><span>Data shows <strong>${data.totalSessions} sessions</strong> across <strong>${data.totalDays} active days</strong>.</span></li>
-                    <li><i class="fas fa-brain text-emerald-400"></i><span>Total focus time recorded: <strong>${Math.round(totalFocus / 60)}h ${totalFocus % 60}m</strong>.</span></li>
-                    <li><i class="fas fa-percentage text-purple-400"></i><span>Average productivity ratio: <strong>${avgProductivity}%</strong> (focus time vs anchor time).</span></li>
-                    <li><i class="fas fa-calendar-day text-amber-400"></i><span>Average focus per active day: <strong>${avgFocusPerDay} minutes</strong>.</span></li>
-                    <li><i class="fas fa-clock text-blue-400"></i><span>Average sessions per active day: <strong>${avgSessionsPerDay}</strong>.</span></li>
-                    <li><i class="fas fa-pause-circle text-slate-400"></i><span>Total breaks taken: <strong>${totalBreaks}</strong> across all sessions.</span></li>
-                </ul>
-            </div>
-        `;
-    }
-    
-    function generateComparisonAnalysis(data) {
-        if (data.dailyAggregates.length < 2) {
-            return `<p class="text-slate-400"><i class="fas fa-info-circle mr-2"></i>Insufficient data for comparison. At least 2 days of data required.</p>`;
-        }
-        
-        const midpoint = Math.floor(data.dailyAggregates.length / 2);
-        const firstHalf = data.dailyAggregates.slice(midpoint); // Older (reversed order)
-        const secondHalf = data.dailyAggregates.slice(0, midpoint); // Newer
-        
-        const firstFocus = firstHalf.reduce((sum, d) => sum + d.totalFocusMinutes, 0);
-        const secondFocus = secondHalf.reduce((sum, d) => sum + d.totalFocusMinutes, 0);
-        const firstAvgProductivity = firstHalf.reduce((sum, d) => sum + d.productivity, 0) / (firstHalf.length || 1);
-        const secondAvgProductivity = secondHalf.reduce((sum, d) => sum + d.productivity, 0) / (secondHalf.length || 1);
-        
-        const focusChange = firstFocus > 0 ? Math.round(((secondFocus - firstFocus) / firstFocus) * 100) : 0;
-        const productivityChange = Math.round(secondAvgProductivity - firstAvgProductivity);
-        
-        const focusTrend = focusChange > 5 ? 'increased' : focusChange < -5 ? 'decreased' : 'remained stable';
-        const productivityTrend = productivityChange > 3 ? 'improved' : productivityChange < -3 ? 'declined' : 'remained consistent';
-        
-        return `
-            <div class="space-y-4">
-                <p class="text-slate-200 font-medium"><i class="fas fa-balance-scale text-purple-400 mr-2"></i>Period Comparison (First Half vs Second Half)</p>
-                <ul class="ai-output-list">
-                    <li><i class="fas fa-arrow-trend-${focusChange >= 0 ? 'up text-emerald-400' : 'down text-red-400'}"></i><span>Pattern observed: Total focus time has <strong>${focusTrend}</strong> by <strong>${Math.abs(focusChange)}%</strong>.</span></li>
-                    <li><i class="fas fa-chart-line text-${productivityChange >= 0 ? 'emerald' : 'red'}-400"></i><span>Productivity ratio has <strong>${productivityTrend}</strong> (${productivityChange >= 0 ? '+' : ''}${productivityChange} percentage points).</span></li>
-                    <li><i class="fas fa-calendar text-cyan-400"></i><span>First period: <strong>${firstHalf.length} days</strong>, ${Math.round(firstFocus / 60)}h ${firstFocus % 60}m total focus.</span></li>
-                    <li><i class="fas fa-calendar-check text-blue-400"></i><span>Second period: <strong>${secondHalf.length} days</strong>, ${Math.round(secondFocus / 60)}h ${secondFocus % 60}m total focus.</span></li>
-                </ul>
-            </div>
-        `;
-    }
-    
-    function generatePeakTimesAnalysis(data) {
-        if (data.totalSessions === 0) {
-            return `<p class="text-slate-400"><i class="fas fa-info-circle mr-2"></i>No session data available for analysis.</p>`;
-        }
-        
-        // Analyze by hour
-        const hourlyFocus = {};
-        const dayOfWeekFocus = {};
-        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        
-        data.sessions.forEach(session => {
-            const hour = parseInt(session.sessionStartTime.split(':')[0]);
-            const hourKey = hour < 12 ? `${hour || 12} AM` : `${hour === 12 ? 12 : hour - 12} PM`;
-            
-            if (!hourlyFocus[hourKey]) hourlyFocus[hourKey] = { focus: 0, count: 0 };
-            hourlyFocus[hourKey].focus += session.totalFocusDuration;
-            hourlyFocus[hourKey].count++;
-            
-            // Day of week analysis
-            const date = new Date(session.sessionDate);
-            const dayName = dayNames[date.getDay()];
-            if (!dayOfWeekFocus[dayName]) dayOfWeekFocus[dayName] = { focus: 0, count: 0 };
-            dayOfWeekFocus[dayName].focus += session.totalFocusDuration;
-            dayOfWeekFocus[dayName].count++;
-        });
-        
-        // Find peak hour
-        const sortedHours = Object.entries(hourlyFocus).sort((a, b) => b[1].focus - a[1].focus);
-        const peakHour = sortedHours[0] || ['N/A', { focus: 0 }];
-        const lowHour = sortedHours[sortedHours.length - 1] || ['N/A', { focus: 0 }];
-        
-        // Find peak day
-        const sortedDays = Object.entries(dayOfWeekFocus).sort((a, b) => b[1].focus - a[1].focus);
-        const peakDay = sortedDays[0] || ['N/A', { focus: 0 }];
-        
-        return `
-            <div class="space-y-4">
-                <p class="text-slate-200 font-medium"><i class="fas fa-clock text-cyan-400 mr-2"></i>Peak Focus Time Analysis</p>
-                <ul class="ai-output-list">
-                    <li><i class="fas fa-sun text-amber-400"></i><span>Data shows peak productivity around <strong>${peakHour[0]}</strong> with ${peakHour[1].focus} minutes total focus.</span></li>
-                    <li><i class="fas fa-moon text-slate-400"></i><span>Lowest focus time recorded around <strong>${lowHour[0]}</strong>.</span></li>
-                    <li><i class="fas fa-calendar-week text-emerald-400"></i><span>Pattern observed: <strong>${peakDay[0]}</strong> tends to be the most productive day (${peakDay[1].focus} minutes total).</span></li>
-                    <li><i class="fas fa-layer-group text-purple-400"></i><span>Data based on ${Object.keys(hourlyFocus).length} different time slots across ${data.totalDays} days.</span></li>
-                </ul>
-            </div>
-        `;
-    }
-    
-    function generateConsistencyAnalysis(data) {
-        if (data.dailyAggregates.length < 3) {
-            return `<p class="text-slate-400"><i class="fas fa-info-circle mr-2"></i>Insufficient data. At least 3 days of data required for consistency analysis.</p>`;
-        }
-        
-        // Find days with low productivity
-        const lowProductivityDays = data.dailyAggregates.filter(d => d.productivity < 60);
-        const highBreakDays = data.dailyAggregates.filter(d => d.totalBreaks > 3);
-        
-        // Calculate gaps between sessions
-        const sortedDates = data.dailyAggregates.map(d => d.date).sort();
-        let maxGap = 0;
-        let gapStart = null;
-        for (let i = 1; i < sortedDates.length; i++) {
-            const prev = new Date(sortedDates[i - 1]);
-            const curr = new Date(sortedDates[i]);
-            const gap = Math.round((curr - prev) / (1000 * 60 * 60 * 24)) - 1;
-            if (gap > maxGap) {
-                maxGap = gap;
-                gapStart = sortedDates[i - 1];
-            }
-        }
-        
-        // Average session length
-        const avgSessionLength = data.totalSessions > 0 ? Math.round(data.sessions.reduce((sum, s) => sum + s.totalFocusDuration, 0) / data.totalSessions) : 0;
-        const shortSessions = data.sessions.filter(s => s.totalFocusDuration < 25).length;
-        
-        let issues = [];
-        
-        if (lowProductivityDays.length > data.dailyAggregates.length * 0.3) {
-            issues.push({ icon: 'fas fa-percentage text-amber-400', text: `Pattern observed: ${lowProductivityDays.length} days (${Math.round(lowProductivityDays.length / data.dailyAggregates.length * 100)}%) had productivity below 60%.` });
-        }
-        
-        if (highBreakDays.length > data.dailyAggregates.length * 0.3) {
-            issues.push({ icon: 'fas fa-pause text-orange-400', text: `Data shows ${highBreakDays.length} days with more than 3 breaks per day, which may fragment focus.` });
-        }
-        
-        if (maxGap >= 2) {
-            issues.push({ icon: 'fas fa-calendar-xmark text-red-400', text: `Longest gap without sessions: ${maxGap} days (after ${gapStart}).` });
-        }
-        
-        if (shortSessions > data.totalSessions * 0.25) {
-            issues.push({ icon: 'fas fa-hourglass-start text-slate-400', text: `${shortSessions} sessions (${Math.round(shortSessions / data.totalSessions * 100)}%) were under 25 minutes, limiting deep focus opportunity.` });
-        }
-        
-        if (issues.length === 0) {
-            issues.push({ icon: 'fas fa-check-circle text-emerald-400', text: 'No significant consistency issues detected in the selected period.' });
-        }
-        
-        return `
-            <div class="space-y-4">
-                <p class="text-slate-200 font-medium"><i class="fas fa-exclamation-triangle text-amber-400 mr-2"></i>Consistency Analysis</p>
-                <ul class="ai-output-list">
-                    ${issues.map(issue => `<li><i class="${issue.icon}"></i><span>${issue.text}</span></li>`).join('')}
-                    <li><i class="fas fa-info-circle text-slate-500"></i><span>Average session focus duration: <strong>${avgSessionLength} minutes</strong>.</span></li>
-                </ul>
-            </div>
-        `;
-    }
-
-    // ====================
-    // INITIALIZATION
-    // ====================
-    function initializeApp() {
-        console.log('%cFocus Flow V1 - Stability Release', 'font-size:14px; color: #059669; font-weight:bold');
-        
-        const today = new Date();
-        document.getElementById('today-label').textContent = today.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
-        
-        // FIX #2: Initialize event listeners ONCE
-        initializeEventListeners();
-        
-        if (loadData()) {
-            console.log('Data loaded from localStorage');
-            if (store.activeSession) {
-                // FIX #3: Restore to paused state for safety - user must manually resume
-                console.log('Active session restored in PAUSED state');
-                switchHomeState('paused');
-            } else {
-                switchHomeState('idle');
-            }
-        } else {
-            store.badges = initializeBadges();
-            switchHomeState('idle');
-        }
-        
-        // FIX #3: Validate task references after load
-        validateActiveTask();
-        
-        renderTasks();
-        updateAllUI();
-        renderBadges();
-        renderHistory();
-        
-        // FIX #1: Timer updates use setInterval only for UI refresh, not time truth
-        // Time is calculated from timestamps, not incremented
-        setInterval(updateTimers, 1000);
-        
-        // Auto-save every 30 seconds
-        setInterval(saveData, 30000);
-        
-        console.log('App initialized successfully');
-    }
-
-    // Make functions globally accessible for onclick handlers
-    window.showTaskSelectorInFocus = showTaskSelectorInFocus;
-    window.hideTaskSelectorInFocus = hideTaskSelectorInFocus;
-
-    document.addEventListener('DOMContentLoaded', initializeApp);
-    </script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
